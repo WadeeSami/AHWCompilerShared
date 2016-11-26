@@ -1,0 +1,6 @@
+﻿  parser.cpp
+c:\users\wadee\desktop\project3\project3\parser.cpp(650): warning C4018: '<': signed/unsigned mismatch
+c:\users\wadee\desktop\project3\project3\parser.cpp(662): warning C4018: '<': signed/unsigned mismatch
+c:\users\wadee\desktop\project3\project3\parser.cpp(348): warning C4715: 'parser::Z': not all control paths return a value
+  Project3.vcxproj -> C:\Users\wadee\Desktop\Project3\Debug\Project3.exe
+  Project3.vcxproj -> C:\Users\wadee\Desktop\Project3\Debug\Project3.pdb (Partial PDB)
