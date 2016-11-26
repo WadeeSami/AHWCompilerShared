@@ -48,44 +48,53 @@ void parser::scanAllTokens() {
 	return (new TOKEN());
 }*/
 
-bool parser::declList() { 
+ast_list * parser::declList() { 
+	ast_list * list = new ast_list();
 	TOKEN *t = new TOKEN();
-	if (decl()) {
+	AST * declNode = decl();
+	list->
+	if (declNode != NULL) {
 		t->type = lx_semicolon;
 		if (match(t)) {
+
 			return declList();
-			
 		}
 		else return false;
 	}	
 	return true;
 }
-bool parser::decl() { 
+AST* parser::decl() { 
 	TOKEN *t = new TOKEN();
 	t->type = kw_var;
 	if (match(t)) {
 		t->type = lx_identifier;
 		if (match(t)) {
+
 			t->type = Ix_colon;
 			if (match(t)) {
 				if (type()) {
+					AST* ast = new AST();
+					ast = make_ast_node(ast_var_decl,
+						st->makeElement(tokens->at(index-3)->str_ptr, *tokens->at(index - 3)),
+						tokens->at(index)->type);
 					//cout << "noErrors";
 					//add to symbolTable new entry 
-					return true;
+					
+					return ast;
 				}
 				else {
 					cout << "errors in type in line "<<fd->GetLineNum();
-					return false;
+					return new AST();
 				}
 			}
 			else {
 				cout << "error: no colon in line " << fd->GetLineNum();
-				return false;
+				return new AST();
 			}
 		}
 		else {
 			cout << "no identefier found in line "<<fd->GetLineNum();
-			return false;
+			return new AST();
 		}
 	}
 	else{
@@ -95,7 +104,15 @@ bool parser::decl() {
 			if (match(t)) {
 				t->type = lx_eq;
 				if (match(t)) {
-					if (expr()) return true;
+					AST* ast = new AST();
+					ast = make_ast_node(ast_const_decl,
+						st->makeElement(tokens->at(index - 2)->str_ptr, *tokens->at(index - 2)),
+						tokens->at(index)->type);
+					if (expr()) {
+						//eval_ast_expr(fd, );
+						return ast;
+						
+					}
 				}
 			}
 		}
@@ -108,7 +125,11 @@ bool parser::decl() {
 						t->type = Ix_colon;
 						if (match(t)) {
 							if (type()) {
-								if (block()) return true;
+								AST* ast = new AST();
+								ast = make_ast_node(ast_const_decl,
+									st->makeElement(tokens->at(index - 2)->str_ptr, *tokens->at(index - 2)),
+									tokens->at(index)->type);
+								if (block()) return ast;
 							}
 						}
 					}
@@ -120,7 +141,11 @@ bool parser::decl() {
 					t->type = lx_identifier;
 					if (match(t)) {
 						if (formalList()) {
-							if (block()) return true;	
+							AST* ast = new AST();
+							ast = make_ast_node(ast_const_decl,
+								st->makeElement(tokens->at(index - 2)->str_ptr, *tokens->at(index - 2)),
+								tokens->at(index)->type);
+							if (block()) return ast;	
 						}
 					}
 				}
@@ -128,7 +153,7 @@ bool parser::decl() {
 		}
 	}
 	
-	return false;
+	return new AST();
 }
 bool parser::type() { 
 	TOKEN *t = new TOKEN();

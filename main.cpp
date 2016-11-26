@@ -1,5 +1,5 @@
 #include <iostream>
-#include "ast.h"
+#include "parser.h"
 #include <vector>
 using namespace std;
 
@@ -39,11 +39,17 @@ int main() {
 	symbolTable *st = new symbolTable();
 	parser *p = new parser();
 
-	//p->parse(fd,st);	
+	p->parse(fd,st);	
+	
+	/*Element *e = new Element();
+	e->id = 0;
+	e->name = "ahmad";
+	e->scopeId = 0;
 	AST *ast = new AST();
-	ast = make_ast_node(0);
+	ast = make_ast_node(0,e,0);
 	cout << ast->type;
-	//cout << ast->f.a_var_decl.name->entry_type;
+	cout << ast->f.a_var_decl.type;
+	st->printElement(ast->f.a_var_decl.name);*/
 	int x;
 	cin >> x;
 	return 0;

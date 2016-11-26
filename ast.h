@@ -1,6 +1,7 @@
 #ifndef __AST__H
 #define __AST__H
-#include "parser.h"
+//#include "parser.h"
+#include "symboltable.h"
 //ast.h
 /* Definitions of list datatypes */
 /* List of AST nodes */

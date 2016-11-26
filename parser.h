@@ -1,5 +1,6 @@
 #pragma once
 #include "symboltable.h"
+#include "ast.h"
 #include <vector>
 #include <iostream>
 
@@ -51,8 +52,8 @@ public:
 	bool block();
 	bool formals();
 	bool formalsBar();
-	bool decl();
-	bool declList();
+	AST * decl();
+	ast_list * declList();
 	bool formalList();
 	bool X();
 	bool match(TOKEN *t);
