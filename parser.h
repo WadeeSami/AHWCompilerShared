@@ -12,6 +12,8 @@ private:
 	int index;
 	vector <TOKEN*> *tokens;
 public:
+	ast_list_cell *program;
+	AST * tempDeclNode;
 	FileDescriptor *fd;
 	SCANNER *myS;
 	symbolTable *st;

@@ -82,6 +82,11 @@ FileDescriptor::FileDescriptor(char * FileName)
 	line_number = 0;
 	char_number = 0;
 
+	fpOUT = new FILE();
+	fpOUT = fopen("asd.txt","w");
+	if (fpOUT == NULL)
+		perror("Error opening file");
+
 	fp = fopen(FileName, "r");
 	if (fp == NULL)
 		perror("Error opening file");

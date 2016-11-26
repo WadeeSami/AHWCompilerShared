@@ -1,3 +1,4 @@
 ﻿  parser.cpp
+cl : Command line warning D9028: minimal rebuild failure, reverting to normal build
   Project3.vcxproj -> C:\Users\wadee\Desktop\Project3\x64\Debug\Project3.exe
   Project3.vcxproj -> C:\Users\wadee\Desktop\Project3\x64\Debug\Project3.pdb (Partial PDB)

@@ -20,6 +20,7 @@ private:
 public:
 	/* Externally-visible functions: */
 	FILE *fp;
+	FILE *fpOUT;
 	FILE *GetFP();
 	char *GetFileName();
 	bool IsOpen(); // returns true if a file is open without errors, //otherwise returns false

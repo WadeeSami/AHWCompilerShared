@@ -41,15 +41,24 @@ int main() {
 
 	p->parse(fd,st);	
 	
-	/*Element *e = new Element();
+	/*FILE *fp = new FILE();
+	fp = fopen("asd.txt", "w");
+	if (fp == NULL)
+		perror("Error opening file");*/
+
+	//fprintf(fp, "ahmad");
+	Element *e = new Element();
 	e->id = 0;
 	e->name = "ahmad";
 	e->scopeId = 0;
 	AST *ast = new AST();
 	ast = make_ast_node(0,e,0);
-	cout << ast->type;
+
+	//print_ast_node(fp,ast);
+	/*cout << ast->type;
 	cout << ast->f.a_var_decl.type;
-	st->printElement(ast->f.a_var_decl.name);*/
+	st->printElement(ast->f.a_var_decl.name);
+	*/
 	int x;
 	cin >> x;
 	return 0;

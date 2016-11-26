@@ -8,11 +8,12 @@ parser::parser() {
 void parser::parse(FileDescriptor *fd, symbolTable *st) {
 	this->fd = fd;
 	this->st = st;
+	program = new ast_list_cell();
 	myS = new SCANNER(this->fd);
 	scanAllTokens();
 	cleanUpVector();
-	if (!declList())
-		cout << "ERRRR";
+
+	program->tail = declList();
 }
 
 void parser::scanAllTokens() {
@@ -51,17 +52,20 @@ void parser::scanAllTokens() {
 ast_list * parser::declList() { 
 	ast_list * list = new ast_list();
 	TOKEN *t = new TOKEN();
-	AST * declNode = decl();
-	list->
-	if (declNode != NULL) {
+	tempDeclNode = decl();
+	ast_list_cell *temp = new ast_list_cell();
+	if (tempDeclNode != NULL && tempDeclNode->f.a_var_decl.name != NULL) {
 		t->type = lx_semicolon;
 		if (match(t)) {
-
-			return declList();
+			temp->head = tempDeclNode;
+			print_ast_node(fd->fpOUT,tempDeclNode);
+			tempDeclNode = NULL;
+			temp->tail = declList();
+			return temp->tail;
 		}
-		else return false;
+		else cout<<"Syntax Error\n";
 	}	
-	return true;
+	return NULL;
 }
 AST* parser::decl() { 
 	TOKEN *t = new TOKEN();
@@ -76,7 +80,7 @@ AST* parser::decl() {
 					AST* ast = new AST();
 					ast = make_ast_node(ast_var_decl,
 						st->makeElement(tokens->at(index-3)->str_ptr, *tokens->at(index - 3)),
-						tokens->at(index)->type);
+						tokens->at(index-1)->type==19?0:4);
 					//cout << "noErrors";
 					//add to symbolTable new entry 
 					
