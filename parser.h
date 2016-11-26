@@ -1,6 +1,4 @@
 #pragma once
-#include "scanner.h"
-#include "fd.h"
 #include "symboltable.h"
 #include <vector>
 #include <iostream>

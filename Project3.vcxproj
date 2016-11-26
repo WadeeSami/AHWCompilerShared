@@ -112,12 +112,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ast.h" />
     <ClInclude Include="fd.h" />
     <ClInclude Include="parser.h" />
     <ClInclude Include="scanner.h" />
     <ClInclude Include="symboltable.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ast.cpp" />
     <ClCompile Include="fd.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="parser.cpp" />

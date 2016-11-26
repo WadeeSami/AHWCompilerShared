@@ -1,8 +1,5 @@
 #include <iostream>
-//#include "../Project3/fd.h"
-//#include "fd.h"
-#include "parser.h"
-//#include "../Project3/scanner.h"
+#include "ast.h"
 #include <vector>
 using namespace std;
 
@@ -42,8 +39,11 @@ int main() {
 	symbolTable *st = new symbolTable();
 	parser *p = new parser();
 
-	p->parse(fd,st);	
-
+	//p->parse(fd,st);	
+	AST *ast = new AST();
+	ast = make_ast_node(0);
+	cout << ast->type;
+	//cout << ast->f.a_var_decl.name->entry_type;
 	int x;
 	cin >> x;
 	return 0;

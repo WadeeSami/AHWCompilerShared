@@ -6,6 +6,24 @@
 #include <vector>
 using namespace std;
 
+typedef enum {
+
+	type_integer,
+	type_string,
+	type_boolean,
+	type_float,
+	type_none
+
+} j_type;
+
+static char *type_names[] = { "integer", "string", "boolean", "float", "none" };
+typedef enum {
+	ste_var,     // a variable
+	ste_const,    //A constant
+	ste_routine,    //A routine
+	ste_undefined,   // ste_entry
+} element_type;
+static char *ste_type_names[] = { "variable", "constant", "routine", "undefined" };
 
 
 struct Element {
@@ -13,8 +31,24 @@ struct Element {
 	int scopeId;
 	char* name;
 	TOKEN token;
+	element_type entry_type;
 
+	union {
+		struct {//l .for a variable record its type
+			j_type type;
+		} var;
+
+		struct {// for a constant record its value
+			int value;
+		} constant;
+
+		struct {// for a routine, record formal parameters and result type
+			struct element_list_cell* formals;// will be defined later
+			j_type result_type;
+		} routine;
+	} f;
 };
+
 
 struct Head {
 	int id;
