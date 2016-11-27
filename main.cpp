@@ -52,7 +52,7 @@ int main() {
 	e->name = "ahmad";
 	e->scopeId = 0;
 	AST *ast = new AST();
-	ast = make_ast_node(0,e,0);
+	//ast = make_ast_node(0,e,0);
 
 	//print_ast_node(fp,ast);
 	/*cout << ast->type;

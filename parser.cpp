@@ -5,6 +5,17 @@ parser::parser() {
 	index = 0;
 }
 
+int parser::findJType(int c)
+{
+	int typeIndex;
+	if (c == 19)return 0;
+	else if (c == 27)return 1;
+	else if (c == 6)return 2;
+	else if (c == 14)return 3;
+	else return 4;
+	return 0;
+}
+
 void parser::parse(FileDescriptor *fd, symbolTable *st) {
 	this->fd = fd;
 	this->st = st;
@@ -13,7 +24,7 @@ void parser::parse(FileDescriptor *fd, symbolTable *st) {
 	scanAllTokens();
 	cleanUpVector();
 
-	program->tail = declList();
+	cout<<eval_ast_expr(fd,expr());
 }
 
 void parser::scanAllTokens() {
@@ -77,12 +88,11 @@ AST* parser::decl() {
 			t->type = Ix_colon;
 			if (match(t)) {
 				if (type()) {
+					
 					AST* ast = new AST();
 					ast = make_ast_node(ast_var_decl,
 						st->makeElement(tokens->at(index-3)->str_ptr, *tokens->at(index - 3)),
-						tokens->at(index-1)->type==19?0:4);
-					//cout << "noErrors";
-					//add to symbolTable new entry 
+						findJType(tokens->at(index - 1)->type));
 					
 					return ast;
 				}
@@ -109,14 +119,16 @@ AST* parser::decl() {
 				t->type = lx_eq;
 				if (match(t)) {
 					AST* ast = new AST();
-					ast = make_ast_node(ast_const_decl,
-						st->makeElement(tokens->at(index - 2)->str_ptr, *tokens->at(index - 2)),
-						tokens->at(index)->type);
-					if (expr()) {
-						//eval_ast_expr(fd, );
+					Element *e = new Element();
+					e = st->makeElement(tokens->at(index - 2)->str_ptr, *tokens->at(index - 2));
+					e->f.constant.value = 8;
+					/*if (expr()) {
+						ast = make_ast_node(ast_const_decl,
+							,
+							type_integer);
+						int evalued = eval_ast_expr(fd, ast);*/
 						return ast;
-						
-					}
+					//}
 				}
 			}
 		}
@@ -449,70 +461,143 @@ bool parser::A() {
 	}
 
 }
-bool parser::expr() { 
-	if (D()) {
-		return exprbar();
+AST* parser::expr() {
+	AST* fromD = new AST();
+	fromD = D();
+	if (fromD) {
+		AST* fromExprBar = new AST();
+		fromExprBar = exprbar();
+		if (fromExprBar) {
+			if (fromExprBar->type) {
+				//make fromD the larg of EXprBAR ast*
+			}
+			else {
+				return fromD;
+			}
+		}
 	}
-	return false;
+	return NULL;
 }
-bool parser::exprbar() {
-	if (relConj()) {
+AST* parser::exprbar() {
+	TOKEN * fromRelConj = new TOKEN();
+	fromRelConj = relConj();
+	if (fromRelConj) {
 		if (D()) {
 			return exprbar();			
 		}
-		else return false;
+		else return NULL;
 	}
 
-	return true;
+	return new AST();
 
 }
-bool parser::D() {
-	if (F()) 
-		if (Dbar())
-			return true;
-	return false;
+AST* parser::D() {
+	AST * fromF = new AST();
+	fromF = F();
+	if (fromF) {
+		AST * fromDbar = new AST();
+		fromDbar = Dbar();
+		if (fromDbar) {
+			if (fromDbar->type != NULL) {//if not lambda make fromF larg in Dbar
+
+			}
+			else {
+				return fromF;
+			}
+		}
+		else {
+			return NULL;
+		}
+	}
+	return NULL;
 }
-bool parser::F() {
-	if (G())
-		return Fbar();
-	else 
-		return false;
+AST* parser::F() {
+	AST * temp = new AST();
+	temp = G();
+	if (temp) {
+		AST * fromFbar = new AST();
+		fromFbar = Fbar();
+		if (fromFbar) {
+			if (fromFbar->type != NULL) {
+				fromFbar->f.a_binary_op.larg = temp; //making left of plus_minus = the thing came from G();
+				return fromFbar;
+			}
+			else {
+				return temp;
+			}
+		}
+		//return Fbar();
+	}
+	else
+		return NULL;
 }
-bool parser::Dbar() {
+AST* parser::Dbar() {
 	if (relOp()) {
 		if (F()) {
 			return Dbar();
 		}
-		else return false;
+		else return NULL;
 	}
-	return true;
+	return new AST();
 
 }
-bool parser::G() {
-	if (H())
-		return Gbar();
-
-	else return false;
-}
-bool parser::Fbar() {
-	if (plus_minus()) {
-		if (G()) {
-			return Fbar();
+AST* parser::G() {
+	AST* temp = new AST();
+	temp = H();
+	if (temp) {
+		//H brought the first integer
+		AST * fromGbar = new AST();
+		fromGbar = Gbar();
+		if (fromGbar) {
+			if (fromGbar->type != NULL) {
+				fromGbar->f.a_binary_op.larg = temp; //making left of plus_minus = the thing came from G();
+				return fromGbar;
+			}
+			else return temp; // return integer came from I() from H() ie Gbar() returns lambda
 		}
-		else return false;
+
 	}
-	return true;
+	else return temp;
+}
+AST* parser::Fbar() {
+	TOKEN* t = new TOKEN();
+	t = plus_minus();
+	if (t) {
+		AST* fromG = new AST();
+		fromG = G();
+		if (fromG) {
+			
+			//pmNode = make_ast_node(t->type == lx_plus ? ast_plus : ast_minus, new AST(), fromG);
+			AST * fromFbar = new AST();
+			fromFbar = Fbar();
+			if (fromFbar) {
+				if (fromFbar->type != NULL) {
+					fromFbar->f.a_binary_op.larg = fromG; //making left of plus_minus = the thing came from G();
+					//
+					return make_ast_node(t->type == lx_plus ? ast_plus : ast_minus, new AST(), fromFbar);
+				}
+				else {//lambda from FBar();
+					AST *pmNode = new AST();
+					pmNode = make_ast_node(t->type == lx_plus?ast_plus:ast_minus,new AST(),fromG);
+					return pmNode;
+				}
+			}
+		}
+		else return NULL;
+	}
+	return new AST();
 	
 }
-bool parser::H() {
+AST* parser::H() {
 	if (uniaryOp()) {
 		return H();
 	}
 	else return I();
 	
 }
-bool parser::I() {
+AST* parser::I() {
 	TOKEN *t = new TOKEN();
+	AST* temp = new AST();
 	t->type = lx_identifier;
 	if (match(t)) {
 		return J();
@@ -520,22 +605,24 @@ bool parser::I() {
 	else {
 		t->type = lx_integer;
 		if (match(t)) {
-			return true;
+			temp = make_ast_node(ast_integer,tokens->at(index-1)->value);
+			return temp;
 		}
 		else {
 			t->type = lx_string;
 			if (match(t)) {
-				return true;
+				temp = make_ast_node(ast_integer, tokens->at(index - 1)->str_ptr);
+				return temp;
 			}
 			else {
 				t->type = kw_true;
 				if (match(t)) {
-					return true;
+					return temp;
 				}
 				else {
 					t->type = kw_false;
 					if (match(t)) {
-						return true;
+						return temp;
 					}
 					else {
 						t->type = lx_lparen;
@@ -543,7 +630,7 @@ bool parser::I() {
 							if (expr()) {
 								t->type = lx_rparen;
 								if(match(t))
-									return true;
+									return temp;
 							}
 						}
 					}
@@ -553,19 +640,43 @@ bool parser::I() {
 	}
 	return false;
 }
-bool parser::J() {
+AST* parser::J() {
+	AST* x = new AST();
+	//x = argList();
 	
-	return argList();
+	return x;
 	
 }
-bool parser::Gbar() {
+AST* parser::Gbar() {
+	TOKEN* t = new TOKEN();
+	t = star_divide();
+	if(t){
+		AST* fromH = new AST();
+		fromH = H();
+		if (fromH) {
+			AST * fromGbar = new AST();
+			fromGbar = Gbar();
+			if (fromGbar) {
+				if (fromGbar->type != NULL) {
+					fromGbar->f.a_binary_op.larg = fromH; //making left of plus_minus = the thing came from G();
+														  //
+					return make_ast_node(t->type == lx_star ? ast_times : ast_divide, new AST(), fromGbar);
+				}
+				else {//lambda from FBar();
+					AST *pmNode = new AST();
+					pmNode = make_ast_node(t->type == lx_star ? ast_times : ast_divide, new AST(), fromH);
+					return pmNode;
+				}
+			}
+		}
+	}
 	if (star_divide()) {
 		if (H()) {
 			return Gbar();
 		}
-		return false;
+		return NULL;
 	}
-	return true;
+	return new AST();
 	
 }
 bool parser::args() { 
@@ -585,13 +696,13 @@ bool parser::B() {
 	}	
 	return true;
 }
-bool parser::relConj(){ 
+TOKEN* parser::relConj(){ 
 	TOKEN *t = new TOKEN();
 	t->type = kw_and;
-	if (match(t))return true;
+	if (match(t))return t;
 	else {
 		t->type = kw_or;
-		if (match(t))return true;
+		if (match(t))return t;
 	}
 	return false;
 }
@@ -617,7 +728,6 @@ bool parser::relOp(){
 	}
 	return false;
 }
-
 bool parser::uniaryOp() {
 	TOKEN *t = new TOKEN();
 	t->type = kw_not;
@@ -629,25 +739,25 @@ bool parser::uniaryOp() {
 	}
 	return false;
 }
-bool parser::star_divide(){ 
+TOKEN* parser::star_divide(){
 	TOKEN *t = new TOKEN();
 	t->type = lx_star;
 
-	if (match(t))return true;
+	if (match(t))return t;
 	else {
 		t->type = lx_slash;
-		if (match(t))return true;
+		if (match(t))return t;
 	}
 	return false;
 }
-bool parser::plus_minus(){
+TOKEN *parser::plus_minus(){
 	TOKEN *t = new TOKEN();
 	t->type = lx_plus;
 
-	if (match(t))return true;
+	if (match(t))return t;
 	else {
 		t->type = lx_minus;
-		if (match(t))return true;
+		if (match(t))return t;
 	}
 	return false;
 }
@@ -661,7 +771,6 @@ bool parser::match(TOKEN *t) {
 		
 	return false;
 }
-
 void parser::cleanUpVector() {
 	for (int i = 0; i < tokens->size(); i++) {
 		if (tokens->at(i)->type == lx_identifier && tokens->at(i)->str_ptr == NULL)
