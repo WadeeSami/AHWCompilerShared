@@ -25,7 +25,6 @@ typedef enum {
 } element_type;
 static char *ste_type_names[] = { "variable", "constant", "routine", "undefined" };
 
-
 struct Element {
 	int id;
 	int scopeId;

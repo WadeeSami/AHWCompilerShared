@@ -25,7 +25,7 @@ public:
 	void scanAllTokens();
 	TOKEN *getNextToken();
 	bool arithOp();
-	bool uniaryOp();
+	TOKEN* uniaryOp();
 	TOKEN* star_divide();
 	TOKEN* plus_minus();
 	bool argList();
@@ -34,6 +34,7 @@ public:
 	AST* exprbar();
 	AST* D();
 	AST* F();
+	int findRelOp(int x);
 	AST* Dbar();
 	AST* G();
 	AST* Fbar();
@@ -44,7 +45,7 @@ public:
 	bool args();
 	bool B();
 	TOKEN* relConj();
-	bool relOp();
+	TOKEN* relOp();
 	bool stmt();
 	bool Z();
 	bool Y();

@@ -499,7 +499,8 @@ AST* parser::D() {
 		fromDbar = Dbar();
 		if (fromDbar) {
 			if (fromDbar->type != NULL) {//if not lambda make fromF larg in Dbar
-
+				fromDbar->f.a_binary_op.larg = fromF; //making left of plus_minus = the thing came from G();
+				return fromDbar;
 			}
 			else {
 				return fromF;
@@ -531,16 +532,43 @@ AST* parser::F() {
 	else
 		return NULL;
 }
+int parser::findRelOp(int x) {
+	int relOper;
+	if (x == 51)return 23;//lt
+	else if (x == 53) return 25; // gt
+	else if (x == 54)return 26;//ge
+	else if (x == 50)return 21;//notEqual
+	else if (x == 47)return 20;//equal
+	else if (x == 52)return 24; //less and equal
+}
 AST* parser::Dbar() {
-	if (relOp()) {
-		if (F()) {
-			return Dbar();
+
+
+	TOKEN* t = new TOKEN();
+	t = relOp();
+	if (t) {
+		AST* fromF = new AST();
+		fromF = F();
+		if (fromF) {
+			AST* fromDbar = new AST();
+			fromDbar = Dbar();
+			if (fromDbar) {
+				if (fromDbar->type) {
+					fromDbar->f.a_binary_op.larg = fromF;
+					return make_ast_node(findRelOp(t->type), new AST(), fromDbar);
+				}
+				else {
+					AST *opNode = new AST();
+					opNode = make_ast_node(findRelOp(t->type), new AST(), fromF);
+					return opNode;
+				}
+			}
 		}
 		else return NULL;
 	}
 	return new AST();
-
 }
+
 AST* parser::G() {
 	AST* temp = new AST();
 	temp = H();
@@ -566,7 +594,6 @@ AST* parser::Fbar() {
 		AST* fromG = new AST();
 		fromG = G();
 		if (fromG) {
-			
 			//pmNode = make_ast_node(t->type == lx_plus ? ast_plus : ast_minus, new AST(), fromG);
 			AST * fromFbar = new AST();
 			fromFbar = Fbar();
@@ -589,8 +616,17 @@ AST* parser::Fbar() {
 	
 }
 AST* parser::H() {
-	if (uniaryOp()) {
-		return H();
+	TOKEN *t = new TOKEN();
+	t = uniaryOp();
+	if (t) {
+		AST* fromH = new AST();
+		fromH = H();
+		if (fromH) {
+			return make_ast_node(t->type == kw_not ? ast_not : ast_uminus, fromH);
+		}
+		else {
+
+		}
 	}
 	else return I();
 	
@@ -617,11 +653,13 @@ AST* parser::I() {
 			else {
 				t->type = kw_true;
 				if (match(t)) {
+					temp = make_ast_node(ast_boolean,1);
 					return temp;
 				}
 				else {
 					t->type = kw_false;
 					if (match(t)) {
+						temp = make_ast_node(ast_boolean, 0);
 						return temp;
 					}
 					else {
@@ -706,38 +744,38 @@ TOKEN* parser::relConj(){
 	}
 	return false;
 }
-bool parser::relOp(){
+TOKEN* parser::relOp(){
 	TOKEN *t = new TOKEN();
 	t->type = lx_eq;
-	if (match(t))return true;
+	if (match(t))return t;
 	else {
 		t->type = lx_neq;
-		if (match(t))return true;
+		if (match(t))return t;
 		else {
 			t->type = lx_lt;
-			if (match(t))return true;
+			if (match(t))return t;
 			else {
 				t->type = lx_le;
-				if (match(t))return true;
+				if (match(t))return t;
 				else {
 					t->type = lx_gt;
-					if (match(t))return true;
+					if (match(t))return t;
 				}
 			}
 		}
 	}
 	return false;
 }
-bool parser::uniaryOp() {
+TOKEN* parser::uniaryOp() {
 	TOKEN *t = new TOKEN();
 	t->type = kw_not;
 
-	if (match(t))return true;
+	if (match(t))return t;
 	else {
 		t->type = lx_minus;
-		if (match(t))return true;
+		if (match(t))return t;
 	}
-	return false;
+	return NULL;
 }
 TOKEN* parser::star_divide(){
 	TOKEN *t = new TOKEN();
