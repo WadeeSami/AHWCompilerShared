@@ -28,8 +28,8 @@ public:
 	TOKEN* uniaryOp();
 	TOKEN* star_divide();
 	TOKEN* plus_minus();
-	bool argList();
-	bool A();
+	ast_list* argList();
+	ast_list* A();
 	AST* expr();
 	AST* exprbar();
 	AST* D();
@@ -42,8 +42,8 @@ public:
 	AST* I();
 	AST* J();
 	AST* Gbar();
-	bool args();
-	bool B();
+	ast_list* args();
+	ast_list* B();
 	TOKEN* relConj();
 	TOKEN* relOp();
 	bool stmt();

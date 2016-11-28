@@ -15,7 +15,6 @@ int parser::findJType(int c)
 	else return 4;
 	return 0;
 }
-
 void parser::parse(FileDescriptor *fd, symbolTable *st) {
 	this->fd = fd;
 	this->st = st;
@@ -24,10 +23,11 @@ void parser::parse(FileDescriptor *fd, symbolTable *st) {
 	scanAllTokens();
 	cleanUpVector();
 
-
-	cout<<eval_ast_expr(fd,expr());
+	AST* a = new AST();
+	a = expr();
+	cout << 'a';
+	//cout<<eval_ast_expr(fd,expr());
 }
-
 void parser::scanAllTokens() {
 	line = fd->getNextLine();
 	TOKEN *T;
@@ -60,7 +60,6 @@ void parser::scanAllTokens() {
 	}
 	return (new TOKEN());
 }*/
-
 ast_list * parser::declList() { 
 	ast_list * list = new ast_list();
 	TOKEN *t = new TOKEN();
@@ -436,29 +435,31 @@ bool parser::stmtList() {
 	 return true;
 	
 }
-bool parser::argList() { 
+ast_list* parser::argList() { 
 	TOKEN *t = new TOKEN();
 	t->type = lx_lparen;
+	AST* x = new AST();
 	if (match(t)) {
 		return A();
 	}
-	return false;
+	return NULL;
 }
-bool parser::A() {
+ast_list* parser::A() {
 	TOKEN *t = new TOKEN();
 	t->type = lx_rparen;
 
-	if (match(t)) 
-		return true;
+	if (match(t))
+		return new ast_list();
 	else {
-		if (args()) {
+		ast_list * argsList = args();
+		if (argsList) {
 			if (match(t))
-				return true;
+				return argsList;
 			else 
-				return false;
+				return NULL;
 		}
 		else 
-			return false;
+			return NULL;
 	}
 
 }
@@ -508,6 +509,7 @@ AST* parser::exprbar() {
 }
 AST* parser::D() {
 	AST * fromF = new AST();
+
 	fromF = F();
 	if (fromF) {
 		AST * fromDbar = new AST();
@@ -583,7 +585,6 @@ AST* parser::Dbar() {
 	}
 	return new AST();
 }
-
 AST* parser::G() {
 	AST* temp = new AST();
 	temp = H();
@@ -651,7 +652,10 @@ AST* parser::I() {
 	AST* temp = new AST();
 	t->type = lx_identifier;
 	if (match(t)) {
-		return J();
+		AST *toI = new AST();
+		toI = J();
+		toI->f.a_call.callee = st->makeElement(tokens->at(index-1)->str_ptr, *tokens->at(index-1));
+		return toI;// should return J()
 	}
 	else {
 		t->type = lx_integer;
@@ -696,10 +700,11 @@ AST* parser::I() {
 	return false;
 }
 AST* parser::J() {
-	AST* x = new AST();
-	//x = argList();
-	
-	return x;
+	ast_list* fromArgList = new ast_list();
+	fromArgList = argList();
+	AST * toI = new AST();
+	toI->f.a_call.arg_list = fromArgList;
+	return toI;
 	
 }
 AST* parser::Gbar() {
@@ -734,22 +739,47 @@ AST* parser::Gbar() {
 	return new AST();
 	
 }
-bool parser::args() { 
-	if (expr()) {
-		return B();
+ast_list* parser::args() { 
+	ast_list* list1 = new ast_list();
+	AST* fromExpr = new AST();
+	fromExpr = expr();
+	if (fromExpr) {
+		ast_list * fromB = new ast_list();
+		fromB = B();
+		AST *evaluedExpr = new AST();
+		evaluedExpr->f.a_integer.value = eval_ast_expr(fd,fromExpr);
+		list1->head = fromExpr;
+		if (fromB) {
+			if (fromB->head) {
+				list1->tail = fromB;
+			}
+			else {
+				//lambda
+				list1->tail = NULL;
+			}
+			return list1;
+		}
 	}
-	return true;
+	return NULL;
 }
-bool parser::B() {
+ast_list* parser::B() {
 	TOKEN *t = new TOKEN();
 	t->type = lx_comma;
 	if (match(t)) {
-		if (args())
-			return true;
+		ast_list * list1 = new ast_list();
+		list1 = args();
+		if (list1) {
+			if (list1->head) {
+				return list1;
+			}
+			else {
+				return new ast_list();
+			}
+		}
 		else 
-			return false;
+			return NULL;
 	}	
-	return true;
+	return new ast_list();
 }
 TOKEN* parser::relConj(){ 
 	TOKEN *t = new TOKEN();
