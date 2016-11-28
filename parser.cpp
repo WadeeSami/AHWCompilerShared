@@ -24,6 +24,7 @@ void parser::parse(FileDescriptor *fd, symbolTable *st) {
 	scanAllTokens();
 	cleanUpVector();
 
+
 	cout<<eval_ast_expr(fd,expr());
 }
 
@@ -470,6 +471,7 @@ AST* parser::expr() {
 		if (fromExprBar) {
 			if (fromExprBar->type) {
 				//make fromD the larg of EXprBAR ast*
+				return fromExprBar->f.a_binary_op.larg = fromD;
 			}
 			else {
 				return fromD;
@@ -482,8 +484,20 @@ AST* parser::exprbar() {
 	TOKEN * fromRelConj = new TOKEN();
 	fromRelConj = relConj();
 	if (fromRelConj) {
-		if (D()) {
-			return exprbar();			
+		AST* fromD = new AST();
+		fromD = D();
+		if (fromD) {
+			AST* fromExprBar = new AST();
+			fromExprBar = exprbar();
+			if (fromExprBar) {
+				if (fromExprBar->type) {
+					fromExprBar->f.a_binary_op.larg = fromD;
+					return make_ast_node(fromRelConj->type == kw_or ? ast_cor : ast_cand, new AST(), fromExprBar);
+				}
+				else {
+					return make_ast_node(fromRelConj->type == kw_or ? ast_cor : ast_cand, new AST(), fromD);
+				}
+			}
 		}
 		else return NULL;
 	}
@@ -538,7 +552,7 @@ int parser::findRelOp(int x) {
 	else if (x == 53) return 25; // gt
 	else if (x == 54)return 26;//ge
 	else if (x == 50)return 21;//notEqual
-	else if (x == 47)return 20;//equal
+	else if (x == 49)return 20;//equal
 	else if (x == 52)return 24; //less and equal
 }
 AST* parser::Dbar() {
@@ -665,10 +679,12 @@ AST* parser::I() {
 					else {
 						t->type = lx_lparen;
 						if (match(t)) {
-							if (expr()) {
+							AST * fromExpr = new AST();
+							fromExpr = expr();
+							if (fromExpr) {
 								t->type = lx_rparen;
 								if(match(t))
-									return temp;
+									return fromExpr;
 							}
 						}
 					}
@@ -750,7 +766,8 @@ TOKEN* parser::relOp(){
 	if (match(t))return t;
 	else {
 		t->type = lx_neq;
-		if (match(t))return t;
+		if (match(t))
+			return t;
 		else {
 			t->type = lx_lt;
 			if (match(t))return t;
@@ -760,6 +777,10 @@ TOKEN* parser::relOp(){
 				else {
 					t->type = lx_gt;
 					if (match(t))return t;
+					else {
+						t->type = lx_ge;
+						if (match(t))return t;
+					}
 				}
 			}
 		}

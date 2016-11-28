@@ -7,8 +7,12 @@ using namespace std;
 char * Operator1[] = {
 	"{","}","(",")",":",".", ";" ,",",":=","+","-",
 	"*","/","=","!=","<","<=",
-	">",">="
+	">",">=","!"
 };
+
+char op11[17] = { '{','}','(',')','[',']',':','.', ';' ,',','+','-',
+'*','/','=','<',
+'>' };
 FILE *FileDescriptor::GetFP()
 {
 	return fp;
@@ -155,7 +159,7 @@ void FileDescriptor::addSpaces(char * str1) {
 			singleOp = true;
 			char t[1] = {' '};
 			t[0] = str[i + 1];
-			if (isOperator(str[i + 1]) && checkIfEqual(t,"(")) {
+			if (str[i + 1] == '=' && !checkIfEqual(t,"(")) {
 				shiftIndex = i + 1;
 				doubleOp = true;
 				singleOp = false;
@@ -195,7 +199,7 @@ bool FileDescriptor::isOperator(char s) {
 	op[1] = '\0';
 	bool valid = false;
 	int i;
-	for (i = 0; i < 19; i++) {
+	for (i = 0; i < 20; i++) {
 		valid = checkIfEqual(op, Operator1[i]);
 		if (valid) {
 			return true;

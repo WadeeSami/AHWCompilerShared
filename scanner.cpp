@@ -37,6 +37,9 @@ char * Operator[] = {
 	">",">="
 };
 
+
+char op22 = '=';
+
 char *operatorString = "{ } ( ) : . ; , := + - * / = != < <= > >=";
 
 LEXEME_TYPE op_key[] = {
@@ -365,7 +368,7 @@ TOKEN * SCANNER::get_op(char c)
 		op1[0] = c;
 		op1[1] = '\0';
 
-		for (i = 0; i < 19; i++) {
+		for (i = 0; i < 20; i++) {
 			valid = checkIfEqual(op1, Operator[i]);
 			if (valid) {
 				T->type = op_key[i];
@@ -379,7 +382,7 @@ TOKEN * SCANNER::get_op(char c)
 		op2[1] = c2;
 		op2[2] = '\0';
 
-		for (i = 0; i < 19; i++) {
+		for (i = 0; i < 21; i++) {
 			valid = checkIfEqual(op2, Operator[i]);
 			if (valid) {
 				T->type = op_key[i];
@@ -706,7 +709,7 @@ bool SCANNER::isOperator(char s) {
 	op[1] = '\0';
 	bool valid = false;
 	int i;
-	for (i = 0; i < 19; i++) {
+	for (i = 0; i < 20; i++) {
 		valid = checkIfEqual(op, Operator[i]);
 		if (valid) {
 			return true;
