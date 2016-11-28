@@ -471,7 +471,8 @@ AST* parser::expr() {
 		if (fromExprBar) {
 			if (fromExprBar->type) {
 				//make fromD the larg of EXprBAR ast*
-				return fromExprBar->f.a_binary_op.larg = fromD;
+				fromExprBar->f.a_binary_op.larg = fromD;
+				return fromExprBar;
 			}
 			else {
 				return fromD;
