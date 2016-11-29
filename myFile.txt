@@ -1,1 +1,1 @@
-, x : integer , t : string , y : boolean;
+x : integer , t : string,  y : boolean;

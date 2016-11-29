@@ -24,7 +24,7 @@ void parser::parse(FileDescriptor *fd, symbolTable *st) {
 	cleanUpVector();
 
 	ast_list* a = new ast_list();
-	a = formalsBar();
+	a = formals();
 	cout << 'a';
 	//cout<<eval_ast_expr(fd,expr());
 }
@@ -226,14 +226,31 @@ bool parser::X() {
 	}
 	return false;
 }
-bool parser::formals() {
+ast_list* parser::formals() {
 	TOKEN *t = new TOKEN();
 	t->type = lx_identifier;
 	if (match(t)) {
+		Element * eOfFunc = new Element();
+		eOfFunc = st->makeElement(tokens->at(index - 1)->str_ptr, *tokens->at(index - 1));
+		ast_list * listOfFormals = new ast_list();
+		listOfFormals->head = new AST();
 		t->type = Ix_colon;
 		if(match(t)){
-			if (type()) {
-				return (formalsBar());
+			TOKEN *t = new TOKEN();
+			t = type();
+			if (t) {
+				ast_list *fromFormalsBar = new ast_list();
+				fromFormalsBar = formalsBar();
+				if (fromFormalsBar) {
+					if (fromFormalsBar->head) {
+						listOfFormals->tail = fromFormalsBar;
+						return listOfFormals;
+					}
+					else {
+						return listOfFormals;
+					}
+				}
+				else return NULL;
 			}
 		}
 	}

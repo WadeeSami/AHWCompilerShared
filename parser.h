@@ -55,7 +55,7 @@ public:
 	TOKEN* type();
 	bool varDeclList();
 	bool block();
-	bool formals();
+	ast_list* formals();
 	ast_list* formalsBar();
 	AST * decl();
 	ast_list * declList();
