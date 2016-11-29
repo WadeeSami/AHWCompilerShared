@@ -59,6 +59,10 @@ void symbolTable::insertElement(char* idName, TOKEN token) {
 	cout << currScope->id << endl;
 	currScope->elements->push_back(temp);
 }
+void symbolTable::insertElement(Element *e) {
+	cout << currScope->id << endl;
+	currScope->elements->push_back(e);
+}
 TOKEN symbolTable::lookUp(char* idName) {
 	Head * temp = new Head();
 	Head * tempParent = new Head();
@@ -74,13 +78,16 @@ TOKEN symbolTable::lookUp(char* idName) {
 			printElement(e);
 			break;
 		}
-		else {
+		else if(tempParent != nullptr){
 			temp = tempParent;
 			tempParent = tempParent->parentScope;
 		}
+		else {
+			cout << "not found in ST";
+		}
 
 	}
-	return *(new TOKEN());
+	return NULL;
 }
 void symbolTable::enterScope() {
 	//cout << &currScope;

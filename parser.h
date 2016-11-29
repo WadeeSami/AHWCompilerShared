@@ -19,6 +19,7 @@ public:
 	symbolTable *st;
 	TOKEN currToken;
 	char * line;
+	bool IDorFuncCall;
 	parser();
 	int findJType(int x);
 	void parse(FileDescriptor * fd, symbolTable * st);
@@ -47,9 +48,9 @@ public:
 	ast_list* B();
 	TOKEN* relConj();
 	TOKEN* relOp();
-	bool stmt();
+	AST* stmt();
 	bool Z();
-	bool Y();
+	AST* Y();
 	bool stmtList();
 	bool varDecl();
 	TOKEN* type();
@@ -59,8 +60,8 @@ public:
 	ast_list* formalsBar();
 	AST * decl();
 	ast_list * declList();
-	bool formalList();
-	bool X();
+	ast_list* formalList();
+	ast_list* X();
 	bool match(TOKEN *t);
 	void cleanUpVector();
 };

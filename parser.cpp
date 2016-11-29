@@ -23,8 +23,8 @@ void parser::parse(FileDescriptor *fd, symbolTable *st) {
 	scanAllTokens();
 	cleanUpVector();
 
-	ast_list* a = new ast_list();
-	a = formals();
+	AST* a = new AST();
+	a = stmt();
 	cout << 'a';
 	//cout<<eval_ast_expr(fd,expr());
 }
@@ -147,7 +147,6 @@ AST* parser::decl() {
 			if (match(t)) {
 				t->type = lx_identifier;
 				if (match(t)) {
-
 					if (formalList()) {
 						t->type = Ix_colon;
 						if (match(t)) {
@@ -202,29 +201,38 @@ TOKEN* parser::type() {
 	}
 	return NULL;
 }
-bool parser::formalList() { 
+ast_list* parser::formalList() { 
 	TOKEN *t = new TOKEN();
 	t->type = lx_lparen;
 	if (match(t)) {
-		if (X()) {
-			return true;
+		ast_list *fromX = new ast_list();
+		fromX = X();
+		if (fromX){
+			return fromX;
+		}
+		else {
+			return NULL;
 		}
 	}
-	return false;
+	return NULL;
 }
-bool parser::X() {
+ast_list* parser::X() {
 	TOKEN *t = new TOKEN();
-	if (formals()) {
+	ast_list * fromFormals = new ast_list();
+	fromFormals = formals();
+	if (fromFormals) {
 		t->type = lx_rparen;
 		if (match(t)) {
-			return true;
+			return fromFormals;
 		}
+		else return NULL;
 	}
 	else {
 		t->type = lx_rparen;
-		if (match(t))return true;
+		if (match(t))return new ast_list();
+		else return NULL;
 	}
-	return false;
+	return NULL;
 }
 ast_list* parser::formals() {
 	TOKEN *t = new TOKEN();
@@ -300,13 +308,38 @@ ast_list* parser::formalsBar() {
 	return new ast_list();
 	
 }
-bool parser::stmt() { 
+AST* parser::stmt() { 
 	TOKEN *t = new TOKEN();
 	t->type = lx_identifier;
 	if (match(t)) {
-		return Y();
+		TOKEN* tt = new TOKEN();
+		*tt = st->lookUp(tokens->at(index - 1)->str_ptr);
+		Element * e = new Element();
+		if (tt) {
+			e = st->makeElement(tt->str_ptr, *tt);
+		}
+		else {
+			return NULL;
+		}
+		AST * fromY = new AST();
+		fromY = Y();
+		if (fromY) {
+			if (fromY->type == ast_call) {//function invocation
+
+			}
+			else if (fromY->type == ast_integer) {
+				//if (tt->type == lx_integer) {
+					return make_ast_node(ast_assign, e, fromY);
+				//}
+			}
+			else if (fromY->type == ast_string) {
+				//if (tt->type == lx_string) {
+					return make_ast_node(ast_assign, e, fromY);
+				//}
+			}
+		}
 	}
-	else {
+	/*else {
 		t->type = kw_if;
 		if (match(t)) {
 			if (expr()) {
@@ -400,8 +433,8 @@ bool parser::stmt() {
 				}
 			
 		}
-	}
-	return false;
+	}*/
+	return NULL;
 }
 bool parser::Z() {
 	TOKEN  * t = new TOKEN();
@@ -420,16 +453,24 @@ bool parser::Z() {
 	}
 	return false;
 }
-bool parser::Y() {
+AST* parser::Y() {
 	TOKEN * t = new TOKEN();
 	t->type = Ix_colon_eq;
 	if (match(t)) {
-		return expr();
+		AST* fromExpr = new AST();
+		fromExpr = expr();
+		if (fromExpr) {
+			return make_ast_node(ast_integer, eval_ast_expr(fd, fromExpr));
+		}
+		else return NULL;
 	}
-	else if(argList()){
-		return true;
+	ast_list * fromArgList = new ast_list();
+	fromArgList = argList();
+	if (fromArgList) {
+		AST* toStmt = new AST();
+		return make_ast_node(ast_call, new Element(), fromArgList);
 	}
-	return false;
+	return NULL;
 }
 bool parser::block() {
 	TOKEN *t = new TOKEN();
@@ -465,14 +506,27 @@ bool parser::varDecl() {
 		t->type = lx_identifier;
 		if (match(t)) {
 			t->type = Ix_colon;
-			return (type());//store in symbole table
-			
+			Element *e = new Element();
+			e = st->makeElement(tokens->at(index-1)->str_ptr, *tokens->at(index - 1));
+			if(match(t)){
+				TOKEN * t = new TOKEN();
+				t = type();
+				//store in symbole table
+				if (t) {
+					e->entry_type = ste_var;
+					st->insertElement(e);
+					return t;
+				}
+				else return NULL;
+			}
 		}
 	}
-	return false;
+	return NULL;
 }
 bool parser::stmtList() { 
 	TOKEN *t = new TOKEN();
+	AST* fromStmt = new AST();
+	fromStmt = stmt();
 	if (stmt()) {
 		t->type = lx_semicolon;
 		if (match(t)) {
