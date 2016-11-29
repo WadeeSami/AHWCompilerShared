@@ -24,9 +24,9 @@ void parser::parse(FileDescriptor *fd, symbolTable *st) {
 	cleanUpVector();
 
 	AST* a = new AST();
-	a = expr();
+	a = stmt();
 	cout << 'a';
-	//cout<<eval_ast_expr(fd,expr());
+	cout<<eval_ast_expr(fd,a);
 }
 void parser::scanAllTokens() {
 	line = fd->getNextLine();
@@ -251,11 +251,16 @@ bool parser::formalsBar() {
 	return true;
 	
 }
-bool parser::stmt() { 
+AST*  parser::stmt() { 
 	TOKEN *t = new TOKEN();
 	t->type = lx_identifier;
 	if (match(t)) {
-		return Y();
+		//make a symbol table entry--> check the index
+		Element* e =st->makeElement(tokens->at(index - 1)->str_ptr, *tokens->at(index - 1));
+		AST* fromY = new AST();
+		fromY = Y();
+		//assignment
+		return make_ast_node(ast_assign, e, fromY);
 	}
 	else {
 		t->type = kw_if;
@@ -264,7 +269,8 @@ bool parser::stmt() {
 				t->type = kw_then;
 				if (match(t)) {
 					if (stmt()) {
-						return Z();
+						//return Z();
+						return NULL;
 					}
 				}
 			}
@@ -277,7 +283,8 @@ bool parser::stmt() {
 						if (match(t)) {
 							if (stmt()) {
 								t->type = kw_od;
-								return (match(t)); 
+								//return (match(t));
+								return NULL;
 							}
 						}
 					}
@@ -297,7 +304,8 @@ bool parser::stmt() {
 											if (match(t)) {
 												if (stmt()) {
 													t->type = kw_od;
-													return (match(t)); 
+													//return (match(t)); 
+													return NULL;
 												}
 											}
 										}
@@ -314,7 +322,8 @@ bool parser::stmt() {
 								t->type = lx_identifier;
 								if(match(t)) {
 									t->type = lx_rparen;
-									return (match(t));
+									//return (match(t));
+									return NULL;
 								}
 							}
 						}
@@ -327,7 +336,8 @@ bool parser::stmt() {
 									t->type = lx_identifier;
 									if (match(t)) {
 										t->type = lx_rparen;
-										return (match(t)); 
+										//return (match(t)); 
+										return NULL;
 									}
 								}
 							}
@@ -338,12 +348,14 @@ bool parser::stmt() {
 									if (match(t)) {
 										if (expr()) {
 											t->type = lx_rparen;
-											return (match(t));
+											//return (match(t));
+											return NULL;
 										}
 									}
 								}
 								else {
-									return (block());
+									//return (block());
+									return NULL;
 								}
 							}
 						}
@@ -354,33 +366,49 @@ bool parser::stmt() {
 	}
 	return false;
 }
-bool parser::Z() {
+AST* parser::Z() {
 	TOKEN  * t = new TOKEN();
 	t->type = kw_fi;
 	if (match(t)) {
-		return true;
+		return new AST();
 	}
 	else {
 		t->type = kw_else;
 		if (match(t)) {
-			if (stmt()) {
+			AST* fromStmt = new AST();
+			fromStmt = stmt();
+			if (fromStmt) {
 				t->type = kw_fi;
-				return (match(t));
+				if (match(t)) {
+					return fromStmt;
+				}
+				else {
+					return NULL;
+				}
 			}
+		}
+		else {
+			return NULL;
 		}
 	}
 	return false;
 }
-bool parser::Y() {
+AST* parser::Y() {
 	TOKEN * t = new TOKEN();
 	t->type = Ix_colon_eq;
 	if (match(t)) {
 		return expr();
 	}
-	else if(argList()){
-		return true;
+	else {
+		ast_list * list = argList();
+		if(list) {
+			AST* fromArgList = new AST();
+			//check this, same As Ahmad's Implementation
+			fromArgList->f.a_call.callee = st->makeElement(tokens->at(index - 1)->str_ptr, *tokens->at(index - 1));
+			return fromArgList;
+		}
 	}
-	return false;
+	return NULL;
 }
 bool parser::block() {
 	TOKEN *t = new TOKEN();
@@ -852,7 +880,9 @@ TOKEN *parser::plus_minus(){
 	return false;
 }
 bool parser::match(TOKEN *t) {
-	if(index<tokens->size())
+	if (index < tokens->size())
+
+		cout << tokens->at(index)->type<<endl;
 	if (tokens->at(index)->type == t->type /*&& tokens->at(index)->str_ptr == t->str_ptr 
 		&& tokens->at(index)->float_value == t->float_value && tokens->at(index)->value == t->value*/) {
 		index++;

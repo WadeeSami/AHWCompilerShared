@@ -1,6 +1,11 @@
 ﻿  parser.cpp
-c:\users\wadee\desktop\project3\project3\parser.cpp(650): warning C4018: '<': signed/unsigned mismatch
-c:\users\wadee\desktop\project3\project3\parser.cpp(662): warning C4018: '<': signed/unsigned mismatch
-c:\users\wadee\desktop\project3\project3\parser.cpp(348): warning C4715: 'parser::Z': not all control paths return a value
-  Project3.vcxproj -> C:\Users\wadee\Desktop\Project3\Debug\Project3.exe
-  Project3.vcxproj -> C:\Users\wadee\Desktop\Project3\Debug\Project3.pdb (Partial PDB)
+c:\users\wadee\desktop\compiler-mine-latest\awh\parser.cpp(10): warning C4101: 'typeIndex': unreferenced local variable
+c:\users\wadee\desktop\compiler-mine-latest\awh\parser.cpp(581): warning C4101: 'relOper': unreferenced local variable
+c:\users\wadee\desktop\compiler-mine-latest\awh\parser.cpp(883): warning C4018: '<': signed/unsigned mismatch
+c:\users\wadee\desktop\compiler-mine-latest\awh\parser.cpp(895): warning C4018: '<': signed/unsigned mismatch
+c:\users\wadee\desktop\compiler-mine-latest\awh\parser.cpp(579): warning C4715: 'parser::F': not all control paths return a value
+c:\users\wadee\desktop\compiler-mine-latest\awh\parser.cpp(588): warning C4715: 'parser::findRelOp': not all control paths return a value
+c:\users\wadee\desktop\compiler-mine-latest\awh\parser.cpp(633): warning C4715: 'parser::G': not all control paths return a value
+c:\users\wadee\desktop\compiler-mine-latest\awh\parser.cpp(677): warning C4715: 'parser::H': not all control paths return a value
+  Project3.vcxproj -> C:\Users\Wadee\Desktop\Compiler-Mine-Latest\awh\Debug\Project3.exe
+  Project3.vcxproj -> C:\Users\Wadee\Desktop\Compiler-Mine-Latest\awh\Debug\Project3.pdb (Partial PDB)

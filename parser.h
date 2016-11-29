@@ -46,9 +46,9 @@ public:
 	ast_list* B();
 	TOKEN* relConj();
 	TOKEN* relOp();
-	bool stmt();
-	bool Z();
-	bool Y();
+	AST* stmt();
+	AST* Z();
+	AST* Y();
 	bool stmtList();
 	bool varDecl();
 	bool type();
