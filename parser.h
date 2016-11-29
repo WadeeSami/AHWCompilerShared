@@ -40,7 +40,7 @@ public:
 	AST* Fbar();
 	AST* H();
 	AST* I();
-	AST* J();
+	ast_list* J();
 	AST* Gbar();
 	ast_list* args();
 	ast_list* B();

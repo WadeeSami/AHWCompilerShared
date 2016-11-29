@@ -440,7 +440,9 @@ ast_list* parser::argList() {
 	t->type = lx_lparen;
 	AST* x = new AST();
 	if (match(t)) {
-		return A();
+		ast_list * fromA = new ast_list();
+		fromA = A();
+		return fromA;
 	}
 	return NULL;
 }
@@ -593,11 +595,12 @@ AST* parser::G() {
 		AST * fromGbar = new AST();
 		fromGbar = Gbar();
 		if (fromGbar) {
-			if (fromGbar->type != NULL) {
+			if (fromGbar->type != 0 ) {
 				fromGbar->f.a_binary_op.larg = temp; //making left of plus_minus = the thing came from G();
 				return fromGbar;
 			}
-			else return temp; // return integer came from I() from H() ie Gbar() returns lambda
+			else 
+				return temp; // return integer came from I() from H() ie Gbar() returns lambda
 		}
 
 	}
@@ -644,18 +647,25 @@ AST* parser::H() {
 
 		}
 	}
-	else return I();
-	
+	else {
+		AST * fromI = new AST();
+		fromI = I();
+		return fromI;
+	}
 }
 AST* parser::I() {
 	TOKEN *t = new TOKEN();
 	AST* temp = new AST();
 	t->type = lx_identifier;
 	if (match(t)) {
-		AST *toI = new AST();
-		toI = J();
-		toI->f.a_call.callee = st->makeElement(tokens->at(index-1)->str_ptr, *tokens->at(index-1));
-		return toI;// should return J()
+		ast_list *fromJ = new ast_list();
+		Element *tempE = new Element();
+		tempE =	st->makeElement(tokens->at(index - 1)->str_ptr, *tokens->at(index - 1));
+		fromJ = J();
+		if (fromJ) {
+			return make_ast_node(ast_call, tempE, fromJ);
+		}
+		return new AST();// should return J()
 	}
 	else {
 		t->type = lx_integer;
@@ -697,15 +707,12 @@ AST* parser::I() {
 			}
 		}
 	}
-	return false;
+	return NULL;
 }
-AST* parser::J() {
+ast_list* parser::J() {
 	ast_list* fromArgList = new ast_list();
 	fromArgList = argList();
-	AST * toI = new AST();
-	toI->f.a_call.arg_list = fromArgList;
-	return toI;
-	
+	return fromArgList;
 }
 AST* parser::Gbar() {
 	TOKEN* t = new TOKEN();
