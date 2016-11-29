@@ -1,1 +1,1 @@
-constant x =2+3*2;
+, x : integer , t : string , y : boolean;

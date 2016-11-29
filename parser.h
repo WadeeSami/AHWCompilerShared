@@ -35,6 +35,7 @@ public:
 	AST* D();
 	AST* F();
 	int findRelOp(int x);
+	int findJTypeFromToken(int x);
 	AST* Dbar();
 	AST* G();
 	AST* Fbar();
@@ -51,11 +52,11 @@ public:
 	bool Y();
 	bool stmtList();
 	bool varDecl();
-	bool type();
+	TOKEN* type();
 	bool varDeclList();
 	bool block();
 	bool formals();
-	bool formalsBar();
+	ast_list* formalsBar();
 	AST * decl();
 	ast_list * declList();
 	bool formalList();

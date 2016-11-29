@@ -1,10 +1,17 @@
 ﻿  parser.cpp
 c:\users\wadee\desktop\project3\project3\parser.cpp(10): warning C4101: 'typeIndex': unreferenced local variable
-c:\users\wadee\desktop\project3\project3\parser.cpp(388): warning C4800: 'AST *': forcing value to bool 'true' or 'false' (performance warning)
-c:\users\wadee\desktop\project3\project3\parser.cpp(565): warning C4101: 'relOper': unreferenced local variable
-c:\users\wadee\desktop\project3\project3\parser.cpp(563): warning C4715: 'parser::F': not all control paths return a value
-c:\users\wadee\desktop\project3\project3\parser.cpp(572): warning C4715: 'parser::findRelOp': not all control paths return a value
-c:\users\wadee\desktop\project3\project3\parser.cpp(618): warning C4715: 'parser::G': not all control paths return a value
-c:\users\wadee\desktop\project3\project3\parser.cpp(665): warning C4715: 'parser::H': not all control paths return a value
+c:\users\wadee\desktop\project3\project3\parser.cpp(236): warning C4800: 'ast_list *': forcing value to bool 'true' or 'false' (performance warning)
+c:\users\wadee\desktop\project3\project3\parser.cpp(410): warning C4800: 'AST *': forcing value to bool 'true' or 'false' (performance warning)
+c:\users\wadee\desktop\project3\project3\parser.cpp(451): warning C4800: 'TOKEN *': forcing value to bool 'true' or 'false' (performance warning)
+c:\users\wadee\desktop\project3\project3\parser.cpp(587): warning C4101: 'relOper': unreferenced local variable
+  Generating Code...
+c:\users\wadee\desktop\project3\project3\parser.cpp(585): warning C4715: 'parser::F': not all control paths return a value
+c:\users\wadee\desktop\project3\project3\parser.cpp(599): warning C4715: 'parser::findJTypeFromToken': not all control paths return a value
+c:\users\wadee\desktop\project3\project3\parser.cpp(594): warning C4715: 'parser::findRelOp': not all control paths return a value
+c:\users\wadee\desktop\project3\project3\parser.cpp(645): warning C4715: 'parser::G': not all control paths return a value
+c:\users\wadee\desktop\project3\project3\parser.cpp(692): warning C4715: 'parser::H': not all control paths return a value
+  Skipping... (no relevant changes detected)
+  ast.cpp
+  main.cpp
   Project3.vcxproj -> C:\Users\wadee\Desktop\Project3\x64\Debug\Project3.exe
   Project3.vcxproj -> C:\Users\wadee\Desktop\Project3\x64\Debug\Project3.pdb (Partial PDB)

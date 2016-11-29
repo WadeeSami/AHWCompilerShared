@@ -24,7 +24,7 @@ void parser::parse(FileDescriptor *fd, symbolTable *st) {
 	cleanUpVector();
 
 	ast_list* a = new ast_list();
-	a = declList();
+	a = formalsBar();
 	cout << 'a';
 	//cout<<eval_ast_expr(fd,expr());
 }
@@ -147,6 +147,7 @@ AST* parser::decl() {
 			if (match(t)) {
 				t->type = lx_identifier;
 				if (match(t)) {
+
 					if (formalList()) {
 						t->type = Ix_colon;
 						if (match(t)) {
@@ -181,25 +182,25 @@ AST* parser::decl() {
 	
 	return new AST();
 }
-bool parser::type() { 
+TOKEN* parser::type() { 
 	TOKEN *t = new TOKEN();
 	t->type = kw_integer;
 	if (match(t)) {
-		return true;
+		return t;
 	}
 	else {
 		t->type = kw_boolean;
 		if (match(t)) {
-			return true;
+			return t;
 		}
 		else {
 			t->type = kw_string;
 			if (match(t)) {
-				return true;
+				return t;
 			}
 		}
 	}
-	return false;
+	return NULL;
 }
 bool parser::formalList() { 
 	TOKEN *t = new TOKEN();
@@ -238,27 +239,48 @@ bool parser::formals() {
 	}
 	return false;
 }
-bool parser::formalsBar() {
+ast_list* parser::formalsBar() {
 	TOKEN *t = new TOKEN();
 	t->type = lx_comma;
 	if (match(t)) {
 		t->type = lx_identifier;
 		if (match(t)) {
+			Element * eOfFunc = new Element();
+			eOfFunc = st->makeElement(tokens->at(index - 1)->str_ptr, *tokens->at(index - 1));
+			ast_list * listOfFormals = new ast_list();
+			listOfFormals->head = new AST();
 			t->type = Ix_colon;
 			if (match(t)) {
-				if (type()) {
-					return(formalsBar()); 
+				TOKEN *tt = new TOKEN();
+				tt = type();
+				if (tt) {
+					listOfFormals->head = make_ast_node(ast_var_decl, eOfFunc->name, findJTypeFromToken(tt->type));
+					ast_list *fromFormalsList = new ast_list();
+					fromFormalsList = formalsBar();
+					if (fromFormalsList) {
+						if (fromFormalsList->head) {
+							listOfFormals->tail = fromFormalsList;
+							return listOfFormals;
+						}
+						else {//lambda
+							listOfFormals->tail = NULL;
+							return listOfFormals;
+						}
+					}
+					else {
+						return NULL;
+					}
 				}
-				else return false;
+				else return NULL;
 
 			}
-			else return false;
+			else return NULL;
 
 		}
-		else return false;
+		else return NULL;
 
 	}
-	return true;
+	return new ast_list();
 	
 }
 bool parser::stmt() { 
@@ -569,6 +591,11 @@ int parser::findRelOp(int x) {
 	else if (x == 50)return 21;//notEqual
 	else if (x == 49)return 20;//equal
 	else if (x == 52)return 24; //less and equal
+}
+int parser::findJTypeFromToken(int x) {
+	if (x == 19)return 0;//int
+	else if (x == 6) return 2; // boolean
+	else if (x == 27)return 1;//string
 }
 AST* parser::Dbar() {
 
