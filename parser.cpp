@@ -23,8 +23,8 @@ void parser::parse(FileDescriptor *fd, symbolTable *st) {
 	scanAllTokens();
 	cleanUpVector();
 
-	AST* a = new AST();
-	a = expr();
+	ast_list* a = new ast_list();
+	a = declList();
 	cout << 'a';
 	//cout<<eval_ast_expr(fd,expr());
 }
@@ -65,16 +65,27 @@ ast_list * parser::declList() {
 	TOKEN *t = new TOKEN();
 	tempDeclNode = decl();
 	ast_list_cell *temp = new ast_list_cell();
-	if (tempDeclNode != NULL && tempDeclNode->f.a_var_decl.name != NULL) {
+	if (tempDeclNode != NULL) {
 		t->type = lx_semicolon;
 		if (match(t)) {
+			temp->head = NULL;
 			temp->head = tempDeclNode;
-			print_ast_node(fd->fpOUT,tempDeclNode);
-			tempDeclNode = NULL;
-			temp->tail = declList();
-			return temp->tail;
+			temp->head->type = tempDeclNode->type;
+			cout << temp->head->type;
+			ast_list * fromDL = new ast_list();
+			fromDL = declList();
+
+			if (fromDL) {
+
+				temp->tail = fromDL;
+				return temp;
+			}
+			else {
+				temp->tail = NULL;
+				return temp;
+			}
 		}
-		else cout<<"Syntax Error\n";
+		//else cout<<"Syntax Error\n";
 	}	
 	return NULL;
 }
@@ -121,14 +132,13 @@ AST* parser::decl() {
 					AST* ast = new AST();
 					Element *e = new Element();
 					e = st->makeElement(tokens->at(index - 2)->str_ptr, *tokens->at(index - 2));
-					e->f.constant.value = 8;
-					/*if (expr()) {
-						ast = make_ast_node(ast_const_decl,
-							,
-							type_integer);
-						int evalued = eval_ast_expr(fd, ast);*/
+					AST * fromExpr = new AST();
+					fromExpr = expr();
+					if (fromExpr) {
+						int evalued = eval_ast_expr(fd, fromExpr);
+						ast = make_ast_node(ast_const_decl,	e, evalued);
 						return ast;
-					//}
+					}
 				}
 			}
 		}
