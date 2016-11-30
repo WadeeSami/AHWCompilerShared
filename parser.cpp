@@ -312,13 +312,15 @@ AST* parser::stmt() {
 	TOKEN *t = new TOKEN();
 	t->type = lx_identifier;
 	if (match(t)) {
+
+		Element * eTest = new Element();
+		
+
 		TOKEN* tt = new TOKEN();
-		*tt = st->lookUp(tokens->at(index - 1)->str_ptr);
+		eTest = st->lookUp(tokens->at(index - 1)->str_ptr);
 		Element * e = new Element();
-		if (tt) {
-			e = st->makeElement(tt->str_ptr, *tt);
-		}
-		else {
+		if (!eTest) {
+			//this is not null
 			return NULL;
 		}
 		AST * fromY = new AST();
@@ -327,15 +329,18 @@ AST* parser::stmt() {
 			if (fromY->type == ast_call) {//function invocation
 
 			}
-			else if (fromY->type == ast_integer) {
-				//if (tt->type == lx_integer) {
-					return make_ast_node(ast_assign, e, fromY);
-				//}
-			}
-			else if (fromY->type == ast_string) {
-				//if (tt->type == lx_string) {
-					return make_ast_node(ast_assign, e, fromY);
-				//}
+			else {
+				if (fromY->type == ast_integer) {
+					//update the symbol table entry
+					eTest->token.value = eval_ast_expr(fd, fromY);
+
+				}
+				else if (fromY->type == ast_string) {
+					eTest->token.stringValue = fromY->f.a_string.str_value;
+
+				}
+				//TODO: think of making new AST with the evaluated expression stored inside
+				return make_ast_node(ast_assign, eTest, fromY);
 			}
 		}
 	}
@@ -523,19 +528,32 @@ bool parser::varDecl() {
 	}
 	return NULL;
 }
-bool parser::stmtList() { 
+ast_list* parser::stmtList() { 
 	TOKEN *t = new TOKEN();
 	AST* fromStmt = new AST();
+	ast_list * parentStmtList = new ast_list();
 	fromStmt = stmt();
-	if (stmt()) {
+	if (fromStmt) {
+		parentStmtList->head = fromStmt;
 		t->type = lx_semicolon;
 		if (match(t)) {
-			return stmtList();
-			
+			ast_list * fromStmtList = new ast_list();
+			fromStmtList = stmtList();
+			if (fromStmtList) {
+				if (fromStmtList->head) {
+					parentStmtList->tail = fromStmtList;
+				}
+				else {
+					parentStmtList->tail = NULL;
+					
+				}
+
+				return parentStmtList;
+			}
 		}
-		else return false;
+		else return NULL;
 	}
-	 return true;
+	 return new ast_list();
 	
 }
 ast_list* parser::argList() { 

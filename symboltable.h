@@ -77,7 +77,7 @@ public:
 	~symbolTable();
 	void insertElement(char* idName, TOKEN token);
 	void insertElement(Element * e);
-	TOKEN lookUp(char* idName);
+	Element* lookUp(char* idName);
 	int parentScopeId(char* idName);
 	void initHead();
 	void printElement(Element e);

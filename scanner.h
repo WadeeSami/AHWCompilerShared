@@ -30,6 +30,7 @@ LEXEME_TYPE;
 struct	TOKEN
 {
 	LEXEME_TYPE type;
+	char * stringValue;
 	int value;  // can be used instead of the str_ptr for IDs and strings
 	float float_value;
 	char *str_ptr; // points to strings or Identifiers, can use value

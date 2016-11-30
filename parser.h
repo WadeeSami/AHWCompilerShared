@@ -51,7 +51,7 @@ public:
 	AST* stmt();
 	bool Z();
 	AST* Y();
-	bool stmtList();
+	ast_list* stmtList();
 	bool varDecl();
 	TOKEN* type();
 	bool varDeclList();

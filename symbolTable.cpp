@@ -63,7 +63,7 @@ void symbolTable::insertElement(Element *e) {
 	cout << currScope->id << endl;
 	currScope->elements->push_back(e);
 }
-TOKEN symbolTable::lookUp(char* idName) {
+Element* symbolTable::lookUp(char* idName) {
 	Head * temp = new Head();
 	Head * tempParent = new Head();
 	temp = this->currScope;
@@ -76,6 +76,7 @@ TOKEN symbolTable::lookUp(char* idName) {
 		e = searchInCurrScope(idName, temp->elements);
 		if (e->name) {
 			printElement(e);
+			return e;
 			break;
 		}
 		else if(tempParent != nullptr){
