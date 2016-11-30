@@ -309,6 +309,14 @@ ast_list* parser::formalsBar() {
 	
 }
 AST* parser::stmt() { 
+	Element * eTest = new Element();
+
+	/*simulate a var in symbol tabe;*/
+	eTest->name = "id3";
+	eTest->token = *(new TOKEN());
+	eTest->token.value = 3;
+	eTest->token.str_ptr = "id3";
+	st->insertElement(eTest);
 	TOKEN *t = new TOKEN();
 	t->type = lx_identifier;
 	if (match(t)) {
@@ -381,39 +389,65 @@ AST* parser::stmt() {
 				return NULL;//fromExpr is null
 			}
 		}
+
 		else {
-			return NULL;//match if failed
-		}
-	}/*
-		else {
-				t->type = kw_while;
-				if (match(t)) {
-					if (expr()) {
-						t->type = kw_do;
-						if (match(t)) {
-							if (stmt()) {
-								t->type = kw_od;
-								return (match(t)); 
+			t->type = kw_while;
+			if (match(t)) {
+				AST* fromExpr = new AST();
+				fromExpr = expr();
+				if (fromExpr) {
+					t->type = kw_do;
+					if (match(t)) {
+						AST* fromStmt = new AST();
+						fromStmt = stmt();
+						if (fromStmt) {
+							t->type = kw_od;
+							if (t) {
+								return make_ast_node(ast_while, fromExpr, fromStmt);
+							}
+							else {
+								return NULL;//if Z is NULL
 							}
 						}
+						else {
+							return NULL;//if stmt is NULL
+						}
+					}
+					else {
+						return NULL; //match failed
 					}
 				}
 				else {
-					t->type = kw_for;
+					return NULL;//fromExpr is null
+				}
+			}
+			else {
+				//match if failed
+				t->type = kw_for;
+				if (match(t)) {
+					t->type = lx_identifier;
 					if (match(t)) {
-						t->type = lx_identifier;
+						Element *e = new Element();
+						e = st->lookUp(tokens->at(index - 1)->str_ptr);
+						t->type = Ix_colon_eq;
 						if (match(t)) {
-							t->type = Ix_colon_eq;
-							if (match(t)) {
-								if (expr()) {
-									t->type = kw_to;
-									if (match(t)) {
-										if (expr()) {
-											t->type = kw_do;
-											if (match(t)) {
-												if (stmt()) {
-													t->type = kw_od;
-													return (match(t)); 
+							AST * fromExpr1 = new AST();
+							fromExpr1 = expr();
+							if (fromExpr1) {
+								t->type = kw_to;
+								if (match(t)) {
+									AST * fromExpr2 = new AST();
+									fromExpr2 = expr();
+									if (fromExpr2) {
+										t->type = kw_do;
+										if (match(t)) {
+											AST * fromStmt = new AST();
+											fromStmt = stmt();
+											if (fromStmt) {
+												t->type = kw_od;
+												if (match(t)) {
+													e->token.value = eval_ast_expr(fd, fromExpr1);
+													return make_ast_node(ast_for, e, fromExpr1, fromExpr2, fromStmt);
 												}
 											}
 										}
@@ -422,52 +456,63 @@ AST* parser::stmt() {
 							}
 						}
 					}
-					else {
-						t->type = kw_read;
+				}
+				else {
+					t->type = kw_read;
+					if (match(t)) {
+						t->type = lx_lparen;
 						if (match(t)) {
-							t->type = lx_lparen;
+							t->type = lx_identifier;
 							if (match(t)) {
-								t->type = lx_identifier;
-								if(match(t)) {
-									t->type = lx_rparen;
-									return (match(t));
-								}
-							}
-						}
-
-						else {
-							t->type = kw_write;
-							if (match(t)) {
-								t->type = lx_lparen;
+								Element *e = new Element();
+								e = st->lookUp(tokens->at(index - 1)->str_ptr);
+								t->type = lx_rparen;
 								if (match(t)) {
-									t->type = lx_identifier;
-									if (match(t)) {
-										t->type = lx_rparen;
-										return (match(t)); 
-									}
-								}
-							}
-							else {
-								t->type = kw_return;
-								if (match(t)) {
-									t->type = lx_lparen;
-									if (match(t)) {
-										if (expr()) {
-											t->type = lx_rparen;
-											return (match(t));
-										}
-									}
-								}
-								else {
-									return (block());
+									return make_ast_node(ast_read, e);
 								}
 							}
 						}
 					}
+					else {
+						t->type = kw_write;
+						if (match(t)) {
+							t->type = lx_lparen;
+							if (match(t)) {
+								t->type = lx_identifier;
+								if (match(t)) {
+									Element *e = new Element();
+									e = st->lookUp(tokens->at(index - 1)->str_ptr);
+									t->type = lx_rparen;
+									if (match(t)) {
+										return make_ast_node(ast_write, e);
+									}
+								}
+							}
+						}
+						else {
+							t->type = kw_return;
+							if (match(t)) {
+								t->type = lx_lparen;
+								if (match(t)) {
+									AST* fromExpr = new AST();
+									fromExpr = expr();
+									if (fromExpr) {
+										t->type = lx_rparen;
+										if (match(t)) {
+											return make_ast_node(ast_return, eval_ast_expr(fd, fromExpr));
+										}
+									}
+								}
+							}
+							else {
+								return (block());
+							}
+						}
+					}
 				}
-			
+			}
 		}
-	}*/
+	}
 	return NULL;
 }
 AST* parser::Z() {
@@ -514,31 +559,42 @@ AST* parser::Y() {
 	}
 	return NULL;
 }
-bool parser::block() {
+AST* parser::block() {
 	TOKEN *t = new TOKEN();
 	t->type = kw_begin;
 	if (match(t)) {
 		//enters new scope
-		if (varDeclList()) {
-			if (stmtList()) {
-				t->type = kw_end;
+		ast_list * fromVarDL = new ast_list();
+		fromVarDL = varDeclList();
+		if (fromVarDL) {
+			if (fromVarDL->head) {
 
-				return (match(t));///exit scope
+			}
+			else {
+
+			}
+			ast_list * fromStmtList = new ast_list();
+			fromStmtList = stmtList();
+			if (fromStmtList) {
+				t->type = kw_end;
+				if (match(t)) {
+					return make_ast_node(ast_block, fromVarDL, fromStmtList);
+				}
 			}
 		}
 	}
 	return false;
 }
-bool parser::varDeclList() { 
+ast_list* parser::varDeclList() { 
 	TOKEN *t = new TOKEN();
 	if (varDecl()) {
 		t->type = lx_semicolon;
 		if (match(t)) {
 			return varDeclList();	
 		}
-		else return false;
+		else return NULL;
 	}
-	return true;
+	return new ast_list();
 	
 }
 bool parser::varDecl() { 

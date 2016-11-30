@@ -54,8 +54,8 @@ public:
 	ast_list* stmtList();
 	bool varDecl();
 	TOKEN* type();
-	bool varDeclList();
-	bool block();
+	ast_list* varDeclList();
+	AST* block();
 	ast_list* formals();
 	ast_list* formalsBar();
 	AST * decl();

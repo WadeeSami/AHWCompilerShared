@@ -1,1 +1,1 @@
-if true then id3 := 7 fi;
+for id3 := 2 to 5 do id3 := 4 od;
