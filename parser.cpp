@@ -25,7 +25,7 @@ void parser::parse(FileDescriptor *fd, symbolTable *st) {
 
 	AST* a = new AST();
 	//ast_list* a = new ast_list();
-	a = block();
+	a = decl();
 	cout << 'a';
 	//cout<<eval_ast_expr(fd,expr());
 }
@@ -145,19 +145,41 @@ AST* parser::decl() {
 		}
 		else {
 			t->type = kw_function;
+			TOKEN * routineReturnType = new TOKEN();
 			if (match(t)) {
 				t->type = lx_identifier;
 				if (match(t)) {
-					if (formalList()) {
+					//create an element
+					Element* e = new Element();
+					e = st->makeElement(tokens->at(index - 1)->str_ptr, *tokens->at(index - 1));
+					if (!st->insertElement(e)) {
+						//already defined
+						return NULL;
+					}
+					ast_list* fromFormalList = new ast_list();
+					fromFormalList = formalList();
+					if (fromFormalList) {
 						t->type = Ix_colon;
 						if (match(t)) {
-							if (type()) {
+							routineReturnType = type();
+							if (routineReturnType) {
 								AST* ast = new AST();
-								ast = make_ast_node(ast_const_decl,
-									st->makeElement(tokens->at(index - 2)->str_ptr, *tokens->at(index - 2)),
-									tokens->at(index)->type);
-								if (block()) return ast;
+								AST* fromBlock = new AST();
+								fromBlock = block();
+								if (fromBlock) {//the body
+									ast = make_ast_node(ast_routine_decl,
+										e, this->convertASTListToElemenntList(fromFormalList),
+										this->findJTypeFromToken(routineReturnType->type),
+										fromBlock
+									);
+									return ast;
+								}
+								
+								
 							}
+						}
+						else {
+							return NULL;
 						}
 					}
 				}
@@ -167,20 +189,43 @@ AST* parser::decl() {
 				if (match(t)) {
 					t->type = lx_identifier;
 					if (match(t)) {
-						if (formalList()) {
-							AST* ast = new AST();
-							ast = make_ast_node(ast_const_decl,
-								st->makeElement(tokens->at(index - 2)->str_ptr, *tokens->at(index - 2)),
-								tokens->at(index)->type);
-							if (block()) return ast;	
+						//create an element
+						Element* e = new Element();
+						e = st->makeElement(tokens->at(index - 1)->str_ptr, *tokens->at(index - 1));
+						if (!st->insertElement(e)) {
+							//already defined
+							return NULL;
+						}
+						ast_list* fromFormalList = new ast_list();
+						fromFormalList = formalList();
+						if (fromFormalList) {
+									AST* ast = new AST();
+									AST* fromBlock = new AST();
+									fromBlock = block();
+									if (fromBlock) {//the body
+										ast = make_ast_node(ast_routine_decl,
+											e, fromFormalList,
+											this->findJTypeFromToken(routineReturnType->type),
+											fromBlock
+										);
+										return ast;
+									}
+
+
+								
+							
+							
 						}
 					}
 				}
 			}
+
+
+
 		}
 	}
 	
-	return new AST();
+	return NULL;
 }
 TOKEN* parser::type() { 
 	TOKEN *t = new TOKEN();
@@ -248,6 +293,8 @@ ast_list* parser::formals() {
 			TOKEN *t = new TOKEN();
 			t = type();
 			if (t) {
+				eOfFunc->f.var.type = j_type(findJTypeFromToken(t->type));
+				listOfFormals->head = make_ast_node(ast_var, eOfFunc);
 				ast_list *fromFormalsBar = new ast_list();
 				fromFormalsBar = formalsBar();
 				if (fromFormalsBar) {
@@ -256,6 +303,7 @@ ast_list* parser::formals() {
 						return listOfFormals;
 					}
 					else {
+						listOfFormals->tail = NULL;
 						return listOfFormals;
 					}
 				}
@@ -567,6 +615,7 @@ AST* parser::block() {
 	t->type = kw_begin;
 	if (match(t)) {
 		//enters new scope
+		st->enterScope();
 		ast_list * fromVarDL = new ast_list();
 		fromVarDL = varDeclList();
 		if (fromVarDL) {
@@ -581,6 +630,7 @@ AST* parser::block() {
 				t->type = kw_end;
 				if (match(t)) {
 					blockNode =  make_ast_node(ast_block, elementList,fromStmtList);
+					st->outScope();
 					return blockNode;
 				}
 			}

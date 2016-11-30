@@ -1,3 +1,5 @@
+procedure id (x : integer, y : string)
 begin
-var id : integer; id := 5;
+var id5 : integer;
+id5 := 55;
 end;
