@@ -49,7 +49,7 @@ public:
 	TOKEN* relConj();
 	TOKEN* relOp();
 	AST* stmt();
-	bool Z();
+	AST* Z();
 	AST* Y();
 	ast_list* stmtList();
 	bool varDecl();

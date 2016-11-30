@@ -315,7 +315,12 @@ AST* parser::stmt() {
 
 		Element * eTest = new Element();
 		
-
+		/*simulate a var in symbol tabe;*/
+		eTest->name = "id3";
+		eTest->token = *(new TOKEN());
+		eTest->token.value = 3;
+		eTest->token.str_ptr = "id3";
+		st->insertElement(eTest);
 		TOKEN* tt = new TOKEN();
 		eTest = st->lookUp(tokens->at(index - 1)->str_ptr);
 		Element * e = new Element();
@@ -344,18 +349,42 @@ AST* parser::stmt() {
 			}
 		}
 	}
-	/*else {
+	else {
 		t->type = kw_if;
 		if (match(t)) {
-			if (expr()) {
+			AST* fromExpr = new AST();
+			fromExpr = expr();
+			if (fromExpr) {
 				t->type = kw_then;
 				if (match(t)) {
-					if (stmt()) {
-						return Z();
+					AST* fromStmt = new AST();
+					fromStmt = stmt();
+					if (fromStmt) {
+						AST* fromZ = new AST();
+						fromZ = Z();
+						if (fromZ) {
+							return make_ast_node(ast_if, fromExpr, fromStmt, fromZ);
+						}
+						else {
+							return NULL;//if Z is NULL
+						}
+					}
+					else {
+						return NULL;//if stmt is NULL
 					}
 				}
+				else {
+					return NULL; //match failed
+				}
+			}
+			else {
+				return NULL;//fromExpr is null
 			}
 		}
+		else {
+			return NULL;//match if failed
+		}
+	}/*
 		else {
 				t->type = kw_while;
 				if (match(t)) {
@@ -441,18 +470,26 @@ AST* parser::stmt() {
 	}*/
 	return NULL;
 }
-bool parser::Z() {
+AST* parser::Z() {
+
 	TOKEN  * t = new TOKEN();
 	t->type = kw_fi;
 	if (match(t)) {
-		return true;
+		return new AST();
 	}
 	else {
 		t->type = kw_else;
 		if (match(t)) {
-			if (stmt()) {
+			AST* fromStmt = new AST();
+			fromStmt = stmt();
+			if (fromStmt) {
 				t->type = kw_fi;
-				return (match(t));
+				if (match(t)) {
+					return fromStmt;
+				}
+			}
+			else {
+				return NULL;
 			}
 		}
 	}
