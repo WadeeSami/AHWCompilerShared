@@ -1,7 +1,10 @@
 ﻿  parser.cpp
 c:\users\wadee\desktop\project3\project3\parser.cpp(10): warning C4101: 'typeIndex': unreferenced local variable
-c:\users\wadee\desktop\project3\project3\parser.cpp(499): error C2440: 'return': cannot convert from 'bool' to 'AST *'
-  c:\users\wadee\desktop\project3\project3\parser.cpp(499): note: Conversion from integral type to pointer type requires reinterpret_cast, C-style cast or function-style cast
-c:\users\wadee\desktop\project3\project3\parser.cpp(504): error C2440: 'return': cannot convert from 'bool' to 'AST *'
-  c:\users\wadee\desktop\project3\project3\parser.cpp(504): note: Conversion from integral type to pointer type requires reinterpret_cast, C-style cast or function-style cast
-c:\users\wadee\desktop\project3\project3\parser.cpp(649): warning C4800: 'TOKEN *': forcing value to bool 'true' or 'false' (performance warning)
+c:\users\wadee\desktop\project3\project3\parser.cpp(787): warning C4101: 'relOper': unreferenced local variable
+c:\users\wadee\desktop\project3\project3\parser.cpp(785): warning C4715: 'parser::F': not all control paths return a value
+c:\users\wadee\desktop\project3\project3\parser.cpp(794): warning C4715: 'parser::findRelOp': not all control paths return a value
+c:\users\wadee\desktop\project3\project3\parser.cpp(799): warning C4715: 'parser::findJTypeFromToken': not all control paths return a value
+c:\users\wadee\desktop\project3\project3\parser.cpp(845): warning C4715: 'parser::G': not all control paths return a value
+c:\users\wadee\desktop\project3\project3\parser.cpp(892): warning C4715: 'parser::H': not all control paths return a value
+  Project3.vcxproj -> C:\Users\wadee\Desktop\Project3\x64\Debug\Project3.exe
+  Project3.vcxproj -> C:\Users\wadee\Desktop\Project3\x64\Debug\Project3.pdb (Partial PDB)

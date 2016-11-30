@@ -52,7 +52,7 @@ public:
 	AST* Z();
 	AST* Y();
 	ast_list* stmtList();
-	bool varDecl();
+	AST* varDecl();
 	TOKEN* type();
 	ast_list* varDeclList();
 	AST* block();

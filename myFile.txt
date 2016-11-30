@@ -1,1 +1,3 @@
-for id3 := 2 to 5 do id3 := 4 od;
+var id : integer;
+var id2 : string;
+var id3 : boolean;

@@ -23,8 +23,9 @@ void parser::parse(FileDescriptor *fd, symbolTable *st) {
 	scanAllTokens();
 	cleanUpVector();
 
-	AST* a = new AST();
-	a = stmt();
+	//AST* a = new AST();
+	ast_list* a = new ast_list();
+	a = varDeclList();
 	cout << 'a';
 	//cout<<eval_ast_expr(fd,expr());
 }
@@ -587,22 +588,38 @@ AST* parser::block() {
 }
 ast_list* parser::varDeclList() { 
 	TOKEN *t = new TOKEN();
-	if (varDecl()) {
+	ast_list * parentList = new ast_list();
+	AST* fromVarDec = new AST();
+	fromVarDec = varDecl();
+	if (fromVarDec) {
+		parentList->head = fromVarDec;
 		t->type = lx_semicolon;
 		if (match(t)) {
-			return varDeclList();	
+			ast_list* fromDesclList = new ast_list();
+			fromDesclList = varDeclList();
+			if (fromDesclList) {
+				parentList->tail = fromDesclList;
+			}
+			else {
+				parentList->tail = NULL;
+			}
+			return parentList;
 		}
-		else return NULL;
+		else {
+			return NULL;
+		}
 	}
-	return new ast_list();
-	
+	else {
+		return NULL;
+	}
+	return new ast_list();	
 }
-bool parser::varDecl() { 
+AST* parser::varDecl() { 
 	TOKEN *t = new TOKEN();
 	t->type = kw_var;
 	if (match(t)) {
 		t->type = lx_identifier;
-		if (match(t)) {
+		if (match(t)) { 
 			t->type = Ix_colon;
 			Element *e = new Element();
 			e = st->makeElement(tokens->at(index-1)->str_ptr, *tokens->at(index - 1));
@@ -612,8 +629,9 @@ bool parser::varDecl() {
 				//store in symbole table
 				if (t) {
 					e->entry_type = ste_var;
+					e->f.var.type = j_type(findJTypeFromToken(t->type));
 					st->insertElement(e);
-					return t;
+					return make_ast_node(ast_var,e);
 				}
 				else return NULL;
 			}
