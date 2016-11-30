@@ -23,9 +23,9 @@ void parser::parse(FileDescriptor *fd, symbolTable *st) {
 	scanAllTokens();
 	cleanUpVector();
 
-	//AST* a = new AST();
-	ast_list* a = new ast_list();
-	a = varDeclList();
+	AST* a = new AST();
+	//ast_list* a = new ast_list();
+	a = block();
 	cout << 'a';
 	//cout<<eval_ast_expr(fd,expr());
 }
@@ -562,6 +562,8 @@ AST* parser::Y() {
 }
 AST* parser::block() {
 	TOKEN *t = new TOKEN();
+	AST* blockNode = new AST();
+	element_list * elementList = new element_list();
 	t->type = kw_begin;
 	if (match(t)) {
 		//enters new scope
@@ -569,22 +571,22 @@ AST* parser::block() {
 		fromVarDL = varDeclList();
 		if (fromVarDL) {
 			if (fromVarDL->head) {
-
-			}
-			else {
-
+				//convert ast_list to element_list
+				 elementList = this->convertASTListToElemenntList(fromVarDL);
+				
 			}
 			ast_list * fromStmtList = new ast_list();
 			fromStmtList = stmtList();
 			if (fromStmtList) {
 				t->type = kw_end;
 				if (match(t)) {
-					return make_ast_node(ast_block, fromVarDL, fromStmtList);
+					blockNode =  make_ast_node(ast_block, elementList,fromStmtList);
+					return blockNode;
 				}
 			}
 		}
 	}
-	return false;
+	return NULL;
 }
 ast_list* parser::varDeclList() { 
 	TOKEN *t = new TOKEN();
@@ -630,7 +632,10 @@ AST* parser::varDecl() {
 				if (t) {
 					e->entry_type = ste_var;
 					e->f.var.type = j_type(findJTypeFromToken(t->type));
-					st->insertElement(e);
+					if (!st->insertElement(e)) {
+						//already defined
+						return NULL;
+					}
 					return make_ast_node(ast_var,e);
 				}
 				else return NULL;
@@ -1110,4 +1115,14 @@ void parser::cleanUpVector() {
 		if (tokens->at(i)->type == lx_identifier && tokens->at(i)->str_ptr == NULL)
 			tokens->erase(tokens->begin() + i);
 	}
+}
+
+element_list * parser::convertASTListToElemenntList(ast_list * list)
+{
+	element_list* elementList = new element_list();
+	while (list ) {
+		elementList->head = list->head->f.a_var.var;
+		list = list->tail;
+	}
+	return elementList;
 }

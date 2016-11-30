@@ -54,14 +54,24 @@ void symbolTable::initScope(Head *currScope) {
 	currScope->elements = new vector<Element*>;
 	currScope->scopes = new vector<Head*>;
 }
-void symbolTable::insertElement(char* idName, TOKEN token) {
+bool symbolTable::insertElement(char* idName, TOKEN token) {
 	Element *temp = makeElement(idName, token);
+	if (this->lookUp(idName)) {
+		cout << "Already defined" << endl;
+		return false;
+	}
 	cout << currScope->id << endl;
 	currScope->elements->push_back(temp);
+	return true;
 }
-void symbolTable::insertElement(Element *e) {
+bool symbolTable::insertElement(Element *e) {
+	if (this->lookUp(e->name)) {
+		cout << "Already defined" << endl;
+		return false;
+	}
 	cout << currScope->id << endl;
 	currScope->elements->push_back(e);
+	return true;
 }
 Element* symbolTable::lookUp(char* idName) {
 	Head * temp = new Head();

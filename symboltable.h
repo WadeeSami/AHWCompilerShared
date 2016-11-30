@@ -75,8 +75,8 @@ public:
 	bool checkIfEqualst(char * first, char * second);
 	Element* searchInCurrScope(char * s, vector <Element*>*v);
 	~symbolTable();
-	void insertElement(char* idName, TOKEN token);
-	void insertElement(Element * e);
+	bool insertElement(char* idName, TOKEN token);
+	bool insertElement(Element * e);
 	Element* lookUp(char* idName);
 	int parentScopeId(char* idName);
 	void initHead();
