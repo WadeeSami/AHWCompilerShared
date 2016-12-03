@@ -140,7 +140,22 @@ AST* parser::decl() {
 						ast = make_ast_node(ast_const_decl,	e, evalued);
 						return ast;
 					}
+					else
+					{
+						cout << "erorr in the expression of the constant 'constant value' at::  " << fd->GetLineNum() << endl;
+						return NULL;
+					}
 				}
+				else
+				{
+					cout << "erorr in the id of the constant decleration at::  " << fd->GetLineNum() << endl;
+					return NULL;
+				}
+			}
+			else
+			{
+				cout << "erorr in the syntax of constant decleration at::  " << fd->GetLineNum() << endl;
+				return NULL;
 			}
 		}
 		else {
@@ -154,6 +169,7 @@ AST* parser::decl() {
 					e = st->makeElement(tokens->at(index - 1)->str_ptr, *tokens->at(index - 1));
 					if (!st->insertElement(e)) {
 						//already defined
+						cout << "erorr in function decleration at::  " << fd->GetLineNum() <<" 'multiple declarations' "<<endl;
 						return NULL;
 					}
 					ast_list* fromFormalList = new ast_list();
@@ -175,13 +191,34 @@ AST* parser::decl() {
 									return ast;
 								}
 								
-								
+								else
+								{
+									cout << "erorr in function decleration at::  " << fd->GetLineNum() << " 'function body' " << endl;
+									return NULL;
+								}
+							}
+							else
+							{
+								cout << "erorr in function decleration at::  " << fd->GetLineNum() << " 'function return type' " << endl;
+								return NULL;
 							}
 						}
-						else {
+						else 
+						{
+							cout << "erorr in function decleration at::  " << fd->GetLineNum() << endl;
 							return NULL;
 						}
 					}
+					else
+					{
+						cout << "erorr in function formals list at::  " << fd->GetLineNum() << endl;
+						return NULL;
+					}
+				}
+				else
+				{
+					cout << "erorr in function id at::  " << fd->GetLineNum() << endl;
+					return NULL;
 				}
 			}
 			else {
@@ -194,6 +231,7 @@ AST* parser::decl() {
 						e = st->makeElement(tokens->at(index - 1)->str_ptr, *tokens->at(index - 1));
 						if (!st->insertElement(e)) {
 							//already defined
+							cout << "erorr in procedure decleration at::  " << fd->GetLineNum() << " 'multiple declarations' " << endl;
 							return NULL;
 						}
 						ast_list* fromFormalList = new ast_list();
@@ -210,21 +248,30 @@ AST* parser::decl() {
 										);
 										return ast;
 									}
-
-
-								
-							
+									else
+									{
+										cout << "erorr in procedure decleration at::  " << fd->GetLineNum() << " 'procedure body' " << endl;
+										return NULL;
+									}
 							
 						}
+						else
+						{
+							cout << "erorr in procedure formals list at::  " << fd->GetLineNum() << endl;
+							return NULL;
+						}
+					}
+					else
+					{
+						cout << "erorr in procedure id at::  " << fd->GetLineNum() << endl;
+						return NULL;
 					}
 				}
+				
 			}
-
-
-
 		}
 	}
-	
+	cout << "unknown decleration at:: " << fd->GetLineNum() << endl;
 	return NULL;
 }
 TOKEN* parser::type() { 
@@ -245,6 +292,7 @@ TOKEN* parser::type() {
 			}
 		}
 	}
+	cout << "unknown data type at:: " << fd->GetLineNum() << endl;
 	return NULL;
 }
 ast_list* parser::formalList() { 
@@ -257,9 +305,11 @@ ast_list* parser::formalList() {
 			return fromX;
 		}
 		else {
+			/*error*/
 			return NULL;
 		}
 	}
+	cout << "expected a '(' at :: " << fd->GetLineNum() << endl;
 	return NULL;
 }
 ast_list* parser::X() {
@@ -271,12 +321,21 @@ ast_list* parser::X() {
 		if (match(t)) {
 			return fromFormals;
 		}
-		else return NULL;
+		else
+		{
+			/*erorr*/
+			cout << "expected a ')' at :: " << fd->GetLineNum() << endl;
+			return NULL;
+		}
 	}
 	else {
 		t->type = lx_rparen;
 		if (match(t))return new ast_list();
-		else return NULL;
+		else
+		{
+			cout << "expected a ')' at :: " << fd->GetLineNum() << endl;
+			return NULL;
+		}
 	}
 	return NULL;
 }
@@ -307,7 +366,11 @@ ast_list* parser::formals() {
 						return listOfFormals;
 					}
 				}
-				else return NULL;
+				else
+				{
+					/*erorr*/
+					return NULL;
+				}
 			}
 		}
 	}
@@ -348,12 +411,17 @@ ast_list* parser::formalsBar() {
 				else return NULL;
 
 			}
-			else return NULL;
+			else
+			{
+				cout << "expected a ':' at :: " << fd->GetLineNum() << endl;
+				return NULL;
+			}
 
 		}
 		else return NULL;
 
 	}
+	cout << "expected a ',' at :: " << fd->GetLineNum() << endl;
 	return new ast_list();
 	
 }
@@ -583,6 +651,7 @@ AST* parser::Z() {
 				}
 			}
 			else {
+				cout << "syntax error  at :: " << fd->GetLineNum() << endl;
 				return NULL;
 			}
 		}
@@ -598,7 +667,11 @@ AST* parser::Y() {
 		if (fromExpr) {
 			return make_ast_node(ast_integer, eval_ast_expr(fd, fromExpr));
 		}
-		else return NULL;
+		else
+		{
+			cout << "syntax error  at :: " << fd->GetLineNum() << endl;
+			return NULL;
+		}
 	}
 	ast_list * fromArgList = new ast_list();
 	fromArgList = argList();
@@ -606,6 +679,7 @@ AST* parser::Y() {
 		AST* toStmt = new AST();
 		return make_ast_node(ast_call, new Element(), fromArgList);
 	}
+	cout << "syntax error  at :: " << fd->GetLineNum() << endl;
 	return NULL;
 }
 AST* parser::block() {
@@ -636,6 +710,7 @@ AST* parser::block() {
 			}
 		}
 	}
+	cout << "syntax error  at :: " << fd->GetLineNum() << endl;
 	return NULL;
 }
 ast_list* parser::varDeclList() { 
@@ -658,10 +733,12 @@ ast_list* parser::varDeclList() {
 			return parentList;
 		}
 		else {
+			cout << "syntax error  at :: " << fd->GetLineNum() << endl;
 			return NULL;
 		}
 	}
 	else {
+		cout << "syntax error  at :: " << fd->GetLineNum() << endl;
 		return NULL;
 	}
 	return new ast_list();	
@@ -683,7 +760,7 @@ AST* parser::varDecl() {
 					e->entry_type = ste_var;
 					e->f.var.type = j_type(findJTypeFromToken(t->type));
 					if (!st->insertElement(e)) {
-						//already defined
+						cout << "multipalte decleration at :: " << fd->GetLineNum() << endl;
 						return NULL;
 					}
 					return make_ast_node(ast_var,e);
@@ -717,10 +794,14 @@ ast_list* parser::stmtList() {
 				return parentStmtList;
 			}
 		}
-		else return NULL;
+		else
+		{
+			cout << "syntax error  at :: " << fd->GetLineNum() << endl;
+			return NULL;
+		}
 	}
+	cout << "syntax error  at :: " << fd->GetLineNum() << endl;
 	 return new ast_list();
-	
 }
 ast_list* parser::argList() { 
 	TOKEN *t = new TOKEN();
@@ -731,6 +812,7 @@ ast_list* parser::argList() {
 		fromA = A();
 		return fromA;
 	}
+	cout << "erorr in the arguments decleration at :: " << fd->GetLineNum() << endl;
 	return NULL;
 }
 ast_list* parser::A() {
@@ -744,11 +826,18 @@ ast_list* parser::A() {
 		if (argsList) {
 			if (match(t))
 				return argsList;
-			else 
+			else
+			{
+				cout << "syntax error  at :: " << fd->GetLineNum() << endl;
 				return NULL;
+			}
+				
 		}
-		else 
+		else
+		{
+			cout << "syntax error  at :: " << fd->GetLineNum() << endl;
 			return NULL;
+		}
 	}
 
 }
@@ -769,6 +858,7 @@ AST* parser::expr() {
 			}
 		}
 	}
+	cout << "syntax error  at :: " << fd->GetLineNum() << endl;
 	return NULL;
 }
 AST* parser::exprbar() {
@@ -790,9 +880,12 @@ AST* parser::exprbar() {
 				}
 			}
 		}
-		else return NULL;
+		else {
+			cout << "syntax error  at :: " << fd->GetLineNum() << endl;
+			return NULL;
+		}
 	}
-
+	cout << "syntax error  at :: " << fd->GetLineNum() << endl;
 	return new AST();
 
 }
@@ -813,9 +906,11 @@ AST* parser::D() {
 			}
 		}
 		else {
+			cout << "syntax error  at :: " << fd->GetLineNum() << endl;
 			return NULL;
 		}
 	}
+	cout << "syntax error  at :: " << fd->GetLineNum() << endl;
 	return NULL;
 }
 AST* parser::F() {
@@ -836,7 +931,11 @@ AST* parser::F() {
 		//return Fbar();
 	}
 	else
+	{
+		cout << "syntax error  at :: " << fd->GetLineNum() << endl;
 		return NULL;
+	}
+		
 }
 int parser::findRelOp(int x) {
 	int relOper;
@@ -875,8 +974,12 @@ AST* parser::Dbar() {
 				}
 			}
 		}
-		else return NULL;
+		else { 
+			cout << "syntax error  at :: " << fd->GetLineNum() << endl;
+			return NULL; 
+		}
 	}
+	cout << "syntax error  at :: " << fd->GetLineNum() << endl;
 	return new AST();
 }
 AST* parser::G() {
@@ -921,8 +1024,12 @@ AST* parser::Fbar() {
 				}
 			}
 		}
-		else return NULL;
+		else {
+			cout << "syntax error  at :: " << fd->GetLineNum() << endl;
+			return NULL;
+		}
 	}
+	cout << "syntax error  at :: " << fd->GetLineNum() << endl;
 	return new AST();
 	
 }
@@ -999,6 +1106,7 @@ AST* parser::I() {
 			}
 		}
 	}
+	cout << "unknown decleration at :: " << fd->GetLineNum() << endl;
 	return NULL;
 }
 ast_list* parser::J() {
@@ -1033,8 +1141,10 @@ AST* parser::Gbar() {
 		if (H()) {
 			return Gbar();
 		}
+		cout << "syntax error  at :: " << fd->GetLineNum() << endl;
 		return NULL;
 	}
+	cout << "syntax error  at :: " << fd->GetLineNum() << endl;
 	return new AST();
 	
 }
@@ -1059,6 +1169,7 @@ ast_list* parser::args() {
 			return list1;
 		}
 	}
+	cout << "syntax error  at :: " << fd->GetLineNum() << endl;
 	return NULL;
 }
 ast_list* parser::B() {
@@ -1075,9 +1186,13 @@ ast_list* parser::B() {
 				return new ast_list();
 			}
 		}
-		else 
+		else
+		{
+			cout << "syntax error  at :: " << fd->GetLineNum() << endl;
 			return NULL;
+		}
 	}	
+	cout << "syntax error  at :: " << fd->GetLineNum() << endl;
 	return new ast_list();
 }
 TOKEN* parser::relConj(){ 
@@ -1088,6 +1203,7 @@ TOKEN* parser::relConj(){
 		t->type = kw_or;
 		if (match(t))return t;
 	}
+	
 	return false;
 }
 TOKEN* parser::relOp(){
@@ -1115,6 +1231,7 @@ TOKEN* parser::relOp(){
 			}
 		}
 	}
+	
 	return false;
 }
 TOKEN* parser::uniaryOp() {
@@ -1126,6 +1243,7 @@ TOKEN* parser::uniaryOp() {
 		t->type = lx_minus;
 		if (match(t))return t;
 	}
+	
 	return NULL;
 }
 TOKEN* parser::star_divide(){
