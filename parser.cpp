@@ -23,10 +23,9 @@ void parser::parse(FileDescriptor *fd, symbolTable *st) {
 	scanAllTokens();
 	cleanUpVector();
 
-	AST* a = new AST();
-	//ast_list* a = new ast_list();
-	a = decl();
-	cout << 'a';
+	//AST* a = new AST();
+	ast_list* a = new ast_list();
+	a = declList();
 	//cout<<eval_ast_expr(fd,expr());
 }
 void parser::scanAllTokens() {
@@ -72,7 +71,6 @@ ast_list * parser::declList() {
 			temp->head = NULL;
 			temp->head = tempDeclNode;
 			temp->head->type = tempDeclNode->type;
-			cout << temp->head->type;
 			ast_list * fromDL = new ast_list();
 			fromDL = declList();
 
@@ -133,10 +131,13 @@ AST* parser::decl() {
 					AST* ast = new AST();
 					Element *e = new Element();
 					e = st->makeElement(tokens->at(index - 2)->str_ptr, *tokens->at(index - 2));
+					e->entry_type = ste_const;
 					AST * fromExpr = new AST();
 					fromExpr = expr();
 					if (fromExpr) {
 						int evalued = eval_ast_expr(fd, fromExpr);
+						e->f.constant.value = evalued;
+						st->insertElement(e);
 						ast = make_ast_node(ast_const_decl,	e, evalued);
 						return ast;
 					}
@@ -152,6 +153,7 @@ AST* parser::decl() {
 					//create an element
 					Element* e = new Element();
 					e = st->makeElement(tokens->at(index - 1)->str_ptr, *tokens->at(index - 1));
+					e->entry_type = ste_routine;
 					if (!st->insertElement(e)) {
 						//already defined
 						return NULL;
@@ -260,7 +262,10 @@ ast_list* parser::formalList() {
 			return NULL;
 		}
 	}
-	return NULL;
+	else {
+		cout << "Syntax Error, missing Left paren at line " << this->fd->GetLineNum() <<endl;
+		return NULL;
+	}
 }
 ast_list* parser::X() {
 	TOKEN *t = new TOKEN();
@@ -271,7 +276,10 @@ ast_list* parser::X() {
 		if (match(t)) {
 			return fromFormals;
 		}
-		else return NULL;
+		else { 
+			cout << "Syntax Error, missing right paren at line " << this->fd->GetLineNum() << endl;
+			return NULL; 
+		}
 	}
 	else {
 		t->type = lx_rparen;
@@ -309,6 +317,12 @@ ast_list* parser::formals() {
 				}
 				else return NULL;
 			}
+			else {
+				cout << "Syntax Error, missing type at line " << this->fd->GetLineNum() << endl;
+			}
+		}
+		else {
+			cout << "Syntax Error, missing colon at line " << this->fd->GetLineNum() << endl;
 		}
 	}
 	return false;
@@ -328,7 +342,9 @@ ast_list* parser::formalsBar() {
 				TOKEN *tt = new TOKEN();
 				tt = type();
 				if (tt) {
-					listOfFormals->head = make_ast_node(ast_var_decl, eOfFunc->name, findJTypeFromToken(tt->type));
+					AST* res = new AST();
+					res = make_ast_node(ast_var_decl, eOfFunc, findJTypeFromToken(tt->type));
+					listOfFormals->head = res;
 					ast_list *fromFormalsList = new ast_list();
 					fromFormalsList = formalsBar();
 					if (fromFormalsList) {
@@ -360,38 +376,49 @@ ast_list* parser::formalsBar() {
 AST* parser::stmt() { 
 	Element * eTest = new Element();
 
-	/*simulate a var in symbol tabe;*/
+	/*simulate a var in symbol tabe;
 	eTest->name = "id3";
 	eTest->token = *(new TOKEN());
 	eTest->token.value = 3;
 	eTest->token.str_ptr = "id3";
-	st->insertElement(eTest);
+	st->insertElement(eTest);*/
 	TOKEN *t = new TOKEN();
 	t->type = lx_identifier;
 	if (match(t)) {
 
 		Element * eTest = new Element();
 		
-		/*simulate a var in symbol tabe;*/
+		/*simulate a var in symbol tabe;
 		eTest->name = "id3";
 		eTest->token = *(new TOKEN());
 		eTest->token.value = 3;
 		eTest->token.str_ptr = "id3";
-		st->insertElement(eTest);
+		st->insertElement(eTest);*/
 		TOKEN* tt = new TOKEN();
 		eTest = st->lookUp(tokens->at(index - 1)->str_ptr);
 		Element * e = new Element();
 		if (!eTest) {
 			//this is not null
+			cout << "The variable " << tokens->at(index - 1)->str_ptr << " Is not defined, This error is at line "<<this->fd->GetLineNum() << endl;
 			return NULL;
+		}
+
+		//this element must be a variable to be in the left side
+		if (eTest->entry_type != ste_var) {
+			cout << "A variable only can be assiged, niether a function nor a constant" << endl;
 		}
 		AST * fromY = new AST();
 		fromY = Y();
 		if (fromY) {
 			if (fromY->type == ast_call) {//function invocation
-
+				//get function's return type
+				cout << "helloo" << endl;
 			}
 			else {
+				if (! this->isSameType(eTest, fromY)) {
+					cout << "Symantic Error, 2  different types "<<eTest->name << " is not the same type  "<< endl;
+				}
+				//if(eTest->f.var.type == )
 				if (fromY->type == ast_integer) {
 					//update the symbol table entry
 					eTest->token.value = eval_ast_expr(fd, fromY);
@@ -596,7 +623,7 @@ AST* parser::Y() {
 		AST* fromExpr = new AST();
 		fromExpr = expr();
 		if (fromExpr) {
-			return make_ast_node(ast_integer, eval_ast_expr(fd, fromExpr));
+			return make_ast_node(fromExpr->type, eval_ast_expr(fd, fromExpr));
 		}
 		else return NULL;
 	}
@@ -621,9 +648,10 @@ AST* parser::block() {
 		if (fromVarDL) {
 			if (fromVarDL->head) {
 				//convert ast_list to element_list
-				 elementList = this->convertASTListToElemenntList(fromVarDL);
-				
+				elementList = this->convertASTListToElemenntList(fromVarDL);
+
 			}
+		}
 			ast_list * fromStmtList = new ast_list();
 			fromStmtList = stmtList();
 			if (fromStmtList) {
@@ -634,7 +662,7 @@ AST* parser::block() {
 					return blockNode;
 				}
 			}
-		}
+		
 	}
 	return NULL;
 }
@@ -690,8 +718,17 @@ AST* parser::varDecl() {
 				}
 				else return NULL;
 			}
+			else {
+				cout << "missing colon at line " << this->fd->GetLineNum()<<endl;
+			}
+		}
+		else {
+			cout << "missing identifier at line " << endl;
 		}
 	}
+	//else {
+		//cout << "missing keyword 'var' at line " << this->fd->GetLineNum() <<endl;
+	//}
 	return NULL;
 }
 ast_list* parser::stmtList() { 
@@ -717,7 +754,10 @@ ast_list* parser::stmtList() {
 				return parentStmtList;
 			}
 		}
-		else return NULL;
+		else {
+			cout << "missing semicolon at line " << this->fd->GetLineNum() << endl;
+			return NULL;
+		}
 	}
 	 return new ast_list();
 	
@@ -968,7 +1008,7 @@ AST* parser::I() {
 		else {
 			t->type = lx_string;
 			if (match(t)) {
-				temp = make_ast_node(ast_integer, tokens->at(index - 1)->str_ptr);
+				temp = make_ast_node(ast_string, tokens->at(index - 1)->str_ptr);
 				return temp;
 			}
 			else {
@@ -1167,12 +1207,52 @@ void parser::cleanUpVector() {
 	}
 }
 
+bool parser::isSameType(Element * element, AST * ast)
+{
+	//this method compares if 2 types are the same
+	/*
+	ast might be a function, a variable or an expression or a simple a literal
+	*/
+	if (element->entry_type == ste_var) {
+		//check ast
+		if (this->convertASTTypeToElementType(ast) == element->f.var.type) {
+			return true;
+		}
+		else {
+			return false;
+		}
+
+	}
+	return false;
+}
+
+int parser::convertASTTypeToElementType(AST * a)
+{
+	if (a->type == ast_integer) {
+		return type_integer;
+	}
+	else if (a->type == ast_string) {
+		return type_string;
+	}
+	else if (a->type == ast_boolean) {
+		return type_boolean;
+	}
+	else if (a->type == ast_float) {
+		return type_float;
+	}
+	return type_none;
+}
+
 element_list * parser::convertASTListToElemenntList(ast_list * list)
 {
 	element_list* elementList = new element_list();
-	while (list ) {
+	element_list* head = new element_list();
+	head = elementList;
+	while (list && list->head) {
 		elementList->head = list->head->f.a_var.var;
+		elementList->tail = new element_list();
+		elementList = elementList->tail;
 		list = list->tail;
 	}
-	return elementList;
+	return head;
 }

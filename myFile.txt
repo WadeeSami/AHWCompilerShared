@@ -1,5 +1,8 @@
-procedure id (x : integer, y : string)
+constant con = 20;
+function id (x : integer, y:string) :integer
 begin
-var id5 : integer;
-id5 := 55;
+var id3 : integer;
+var id1 : boolean;
+id1 := true;
+id1 := 152;
 end;

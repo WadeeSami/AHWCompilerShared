@@ -36,9 +36,10 @@ void symbolTable::printString(char *s) {
 	for (int i = 0; i < strlen(s); i++)cout << s[i];
 }
 void symbolTable::printElement(Element *e) {
-	cout << endl << "id: \t" << e->id << endl << "scopeID:" << e->scopeId << endl << "Name: \t";
-	printString(e->name);
-	cout << "\n*****************\n";
+	return;
+	//cout << endl << "id: \t" << e->id << endl << "scopeID:" << e->scopeId << endl << "Name: \t";
+	//printString(e->name);
+	//cout << "\n*****************\n";
 }
 void symbolTable::printElementsInScope(Head *h)
 {
@@ -94,7 +95,7 @@ Element* symbolTable::lookUp(char* idName) {
 			tempParent = tempParent->parentScope;
 		}
 		else {
-			cout << "not found in ST";
+			//ut << idName << " was not found in ST";
 		}
 
 	}

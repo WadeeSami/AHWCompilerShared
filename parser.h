@@ -64,5 +64,7 @@ public:
 	ast_list* X();
 	bool match(TOKEN *t);
 	void cleanUpVector();
+	bool isSameType(Element*, AST*);
+	int convertASTTypeToElementType(AST*);
 	element_list*  convertASTListToElemenntList(ast_list* list);
 };

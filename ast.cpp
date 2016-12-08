@@ -170,6 +170,7 @@ int eval_ast_expr (FileDescriptor *fd, AST *n)
         case ast_string:
             //report_error (fd, "Cannot use strings in constant expressions");
             cout << "Cannot use strings in constant expressions\n";
+
             return (0);
         case ast_boolean:
             return (n->f.a_boolean.value);

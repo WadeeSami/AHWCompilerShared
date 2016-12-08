@@ -1,10 +1,3 @@
-﻿  parser.cpp
-c:\users\wadee\desktop\project3\project3\parser.cpp(10): warning C4101: 'typeIndex': unreferenced local variable
-c:\users\wadee\desktop\project3\project3\parser.cpp(842): warning C4101: 'relOper': unreferenced local variable
-c:\users\wadee\desktop\project3\project3\parser.cpp(840): warning C4715: 'parser::F': not all control paths return a value
-c:\users\wadee\desktop\project3\project3\parser.cpp(849): warning C4715: 'parser::findRelOp': not all control paths return a value
-c:\users\wadee\desktop\project3\project3\parser.cpp(854): warning C4715: 'parser::findJTypeFromToken': not all control paths return a value
-c:\users\wadee\desktop\project3\project3\parser.cpp(900): warning C4715: 'parser::G': not all control paths return a value
-c:\users\wadee\desktop\project3\project3\parser.cpp(947): warning C4715: 'parser::H': not all control paths return a value
+﻿  ast.cpp
   Project3.vcxproj -> C:\Users\wadee\Desktop\Project3\x64\Debug\Project3.exe
   Project3.vcxproj -> C:\Users\wadee\Desktop\Project3\x64\Debug\Project3.pdb (Partial PDB)
