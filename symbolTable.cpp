@@ -14,6 +14,9 @@ symbolTable::symbolTable() {
 }
 bool symbolTable::checkIfEqualst(char* first, char* second) {
 
+	if (!first || !second) {
+		return false;
+	}
 	if (!strcmp(first, second))
 		return true;
 	return false;
@@ -67,7 +70,7 @@ bool symbolTable::insertElement(char* idName, TOKEN token) {
 }
 bool symbolTable::insertElement(Element *e) {
 	if (this->lookUp(e->name)) {
-		cout << "Already defined" << endl;
+		cout << "Already defined variable/method "<<e->name << endl;
 		return false;
 	}
 	cout << currScope->id << endl;

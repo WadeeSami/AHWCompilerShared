@@ -1,8 +1,5 @@
-constant con = 20;
 function id (x : integer, y:string) :integer
 begin
 var id3 : integer;
 var id1 : boolean;
-id1 := true;
-id1 := 152;
 end;

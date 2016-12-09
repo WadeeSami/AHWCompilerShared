@@ -94,7 +94,9 @@ AST* parser::decl() {
 	if (match(t)) {
 		t->type = lx_identifier;
 		if (match(t)) {
-
+			Element * newId = st->makeElement(tokens->at(index - 1)->str_ptr, *tokens->at(index - 1));
+			newId->name = tokens->at(index - 1)->str_ptr;
+			newId->entry_type = ste_var;
 			t->type = Ix_colon;
 			if (match(t)) {
 				if (type()) {
@@ -150,14 +152,9 @@ AST* parser::decl() {
 			if (match(t)) {
 				t->type = lx_identifier;
 				if (match(t)) {
-					//create an element
-					Element* e = new Element();
-					e = st->makeElement(tokens->at(index - 1)->str_ptr, *tokens->at(index - 1));
-					e->entry_type = ste_routine;
-					if (!st->insertElement(e)) {
-						//already defined
-						return NULL;
-					}
+					TOKEN * tempFunctionToken = tokens->at(index - 1);
+
+
 					ast_list* fromFormalList = new ast_list();
 					fromFormalList = formalList();
 					if (fromFormalList) {
@@ -165,10 +162,26 @@ AST* parser::decl() {
 						if (match(t)) {
 							routineReturnType = type();
 							if (routineReturnType) {
+								
+								//create an element
+								Element* e = new Element();
+								e = st->makeElement(tempFunctionToken->str_ptr, *tempFunctionToken);
+								e->entry_type = ste_routine;
+								e->f.routine.result_type = j_type(this->findJTypeFromToken(routineReturnType->type));
+								//TODO: fix this shit
+								e->f.routine.formals = NULL;
+								if (!st->insertElement(e)) {
+									//already defined
+									return NULL;
+								}
+								
+								///////
+
 								AST* ast = new AST();
 								AST* fromBlock = new AST();
 								fromBlock = block();
 								if (fromBlock) {//the body
+									
 									ast = make_ast_node(ast_routine_decl,
 										e, this->convertASTListToElemenntList(fromFormalList),
 										this->findJTypeFromToken(routineReturnType->type),
@@ -413,6 +426,7 @@ AST* parser::stmt() {
 			if (fromY->type == ast_call) {//function invocation
 				//get function's return type
 				cout << "helloo" << endl;
+				//check if the callee return type is the same as the caller type
 			}
 			else {
 				if (! this->isSameType(eTest, fromY)) {
@@ -623,6 +637,9 @@ AST* parser::Y() {
 		AST* fromExpr = new AST();
 		fromExpr = expr();
 		if (fromExpr) {
+			if (fromExpr->type == ast_call) {
+				return fromExpr;
+			}
 			return make_ast_node(fromExpr->type, eval_ast_expr(fd, fromExpr));
 		}
 		else return NULL;
@@ -633,6 +650,7 @@ AST* parser::Y() {
 		AST* toStmt = new AST();
 		return make_ast_node(ast_call, new Element(), fromArgList);
 	}
+	cout << "Syntax error , either := is missing, or error in function invokation at line " << this->fd->GetLineNum() <<endl;
 	return NULL;
 }
 AST* parser::block() {
@@ -703,6 +721,8 @@ AST* parser::varDecl() {
 			t->type = Ix_colon;
 			Element *e = new Element();
 			e = st->makeElement(tokens->at(index-1)->str_ptr, *tokens->at(index - 1));
+			e->entry_type = ste_var;
+
 			if(match(t)){
 				TOKEN * t = new TOKEN();
 				t = type();
@@ -992,7 +1012,12 @@ AST* parser::I() {
 	if (match(t)) {
 		ast_list *fromJ = new ast_list();
 		Element *tempE = new Element();
-		tempE =	st->makeElement(tokens->at(index - 1)->str_ptr, *tokens->at(index - 1));
+		tempE = this->st->lookUp(tokens->at(index - 1)->str_ptr);
+		if (!tempE || tempE->entry_type != ste_routine) {
+			cout << "Error, invoking undefined function at line" << this->fd->GetLineNum() << endl;
+			return NULL;
+		}
+		//tempE =	st->makeElement(tokens->at(index - 1)->str_ptr, *tokens->at(index - 1));
 		fromJ = J();
 		if (fromJ) {
 			return make_ast_node(ast_call, tempE, fromJ);
