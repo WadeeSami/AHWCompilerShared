@@ -508,7 +508,7 @@ AST* parser::stmt() {
 						fromStmt = stmt();
 						if (fromStmt) {
 							t->type = kw_od;
-							if (t) {
+							if (match(t)) {
 								return make_ast_node(ast_while, fromExpr, fromStmt);
 							}
 							else {

@@ -159,6 +159,7 @@ j_type sc::symanticallycheckExpression(AST * expr)
 
 		if (left->type == ast_boolean || left->type == ast_string || right->type == ast_boolean || right->type == ast_string) {
 			cout << " This Language can't add booleans or strings" << endl;
+			return type_none;
 		}
 		if (left->type == ast_integer && right->type == ast_integer) {
 			return type_integer;
@@ -170,7 +171,7 @@ j_type sc::symanticallycheckExpression(AST * expr)
 				return type_integer;
 			}
 			else {
-				return j_type();
+				return type_none;
 			}
 		}
 	}
@@ -187,6 +188,7 @@ j_type sc::symanticallycheckExpression(AST * expr)
 
 		if (left->type == ast_boolean || left->type == ast_string || right->type == ast_boolean || right->type == ast_string) {
 			cout << " This Language can't add booleans or strings" << endl;
+			return type_none;
 		}
 		if (left->type == ast_integer && right->type == ast_integer) {
 			return type_boolean;
@@ -294,7 +296,7 @@ bool sc::symanticallyCheckStmt(AST * stmt)
 	{
 	case ast_assign: {
 		//check expression
-		return this->symanticallycheckExpression(stmt->f.a_assign.rhs);
+		return this->symanticallycheckExpression(stmt->f.a_assign.rhs) != type_none;
 	}
 	case ast_if: {
 		//check predicate
@@ -302,11 +304,21 @@ bool sc::symanticallyCheckStmt(AST * stmt)
 			cout << "symantic error in the if statement predicate " << endl;
 		}
 		//check consequence
-		if (this->symanticallyCheckStmt(stmt->f.a_if.conseq) == type_none) {
+		if (!this->symanticallyCheckStmt(stmt->f.a_if.conseq)) {
 			cout << "symantic error in the if statement consequence " << endl;
 		}
-		if (this->symanticallyCheckStmt(stmt->f.a_if.altern) == type_none) {
+		if (!this->symanticallyCheckStmt(stmt->f.a_if.altern)) {
 			cout << "symantic error in the if statement alternative " << endl;
+		}
+	}
+	case ast_while:{
+		//check predicate
+		if (this->symanticallycheckExpression(stmt->f.a_while.predicate) != type_boolean) {
+			cout << "symantic error in the while statement predicate " << endl;
+		}
+		//check consequence
+		if (!this->symanticallyCheckStmt(stmt->f.a_while.body)) {
+			cout << "symantic error in the while statement body " << endl;
 		}
 	}
 	default:
