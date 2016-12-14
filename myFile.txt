@@ -1,9 +1,9 @@
-function id (x : integer, y:string) :boolean
+function id (x : integer, y:string) :integer
 begin
 var id3 : integer;
 var id1 : boolean;
-id1 := 3;
-return (id1);
+id3 := 3;
+return (id3);
 end;
 var id2 : string;
 constant m = 55;

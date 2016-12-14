@@ -57,7 +57,13 @@ bool sc::isroutineSymanticallyCorrect(AST * routineTree)
 		j_type formalReturnType = routineTree->f.a_routine_decl.result_type;
 		//ast_type  actualReturnType =  returnAST->f.a_return.expr->type;
 		ast_type  actualReturnType = this->findExpressionResultType(returnAST->f.a_return.expr);
-		if (formalReturnType != this->convertAstTypeToJType(actualReturnType)) {
+		
+		if (actualReturnType == ast_var) {
+			j_type varJType = returnAST->f.a_return.expr->f.a_var.var->f.var.type;
+			if (formalReturnType !=varJType) {
+				cout << "This function  \' " << routineTree->f.a_routine_decl.name->name << " \' returns a strange variable type" << endl;;
+			}
+		}else if (formalReturnType != this->convertAstTypeToJType(actualReturnType)) {
 			cout << "This function  \' "<< routineTree->f.a_routine_decl.name->name << " \' does not return value correcly"<<endl;;
 		}
 		
@@ -114,6 +120,9 @@ ast_type sc::findExpressionResultType(AST * expr)
 	case ast_cor:
 	{
 		return ast_boolean;
+	}
+	case ast_var: {
+		return ast_var;
 	}
 
 	default: {

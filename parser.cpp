@@ -1022,14 +1022,26 @@ AST* parser::I() {
 		ast_list *fromJ = new ast_list();
 		Element *tempE = new Element();
 		tempE = this->st->lookUp(tokens->at(index - 1)->str_ptr);
-		if (!tempE || tempE->entry_type != ste_routine) {
-			cout << "Error, invoking undefined function at line" << this->fd->GetLineNum() << endl;
+		if (!tempE) {
+			cout << "Error, invoking undefined variable or function at line" << this->fd->GetLineNum() << endl;
 			return NULL;
 		}
 		//tempE =	st->makeElement(tokens->at(index - 1)->str_ptr, *tokens->at(index - 1));
 		fromJ = J();
 		if (fromJ) {
+			if (tempE->entry_type != ste_routine) {
+				cout << "calling undefined function " << endl;
+			}
 			return make_ast_node(ast_call, tempE, fromJ);
+		}
+		else {
+			//this is not a function, it's a typical variable
+			if (tempE->entry_type == ste_var || tempE->entry_type == ste_const) {
+				return make_ast_node(ast_var, tempE);
+			}
+			else {
+				cout << "calling undefined variable " << endl;
+			}
 		}
 		return new AST();// should return J()
 	}
