@@ -310,6 +310,7 @@ bool sc::symanticallyCheckStmt(AST * stmt)
 		if (!this->symanticallyCheckStmt(stmt->f.a_if.altern)) {
 			cout << "symantic error in the if statement alternative " << endl;
 		}
+		return true;
 	}
 	case ast_while:{
 		//check predicate
@@ -320,6 +321,24 @@ bool sc::symanticallyCheckStmt(AST * stmt)
 		if (!this->symanticallyCheckStmt(stmt->f.a_while.body)) {
 			cout << "symantic error in the while statement body " << endl;
 		}
+		return true;
+	}
+	case ast_for: {
+		//check if var is integer
+		if (stmt->f.a_for.var->f.var.type != type_integer) {
+			cout << "Symantic error , loop variable must be an integer" << endl;
+		}
+		//the expressions must return an integer
+		if (this->symanticallycheckExpression(stmt->f.a_for.lower_bound) != type_integer) {
+			cout << "Symantic error in the lower bound of the for loop, must result in an integer value" << endl;
+		}
+		if (this->symanticallycheckExpression(stmt->f.a_for.upper_bound) != type_integer) {
+			cout << "Symantic error in the upper bound of the for loop, must result in an integer value" << endl;
+		}
+		if (!this->symanticallyCheckStmt(stmt->f.a_for.body)) {
+			cout << "symantic error in the for statement body " << endl;
+		}
+		return true;
 	}
 	default:
 		break;
