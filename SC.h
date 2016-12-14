@@ -14,4 +14,8 @@ public:
 	bool isroutineSymanticallyCorrect(AST * routineTree);
 	int convertAstTypeToJType(ast_type type);
 	ast_type findExpressionResultType(AST * expr);
+	j_type symanticallycheckExpression(AST * expr);
+	bool symanicallyCheckfunctionBody(AST * body);
+	bool symanticallyCheckStmt(AST * stmt);
+
 };

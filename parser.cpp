@@ -222,7 +222,7 @@ AST* parser::decl() {
 									if (fromBlock) {//the body
 										ast = make_ast_node(ast_routine_decl,
 											e, fromFormalList,
-											this->findJTypeFromToken(routineReturnType->type),
+											type_none,//this is a procedure, ot should return nithing
 											fromBlock
 										);
 										return ast;
@@ -431,21 +431,35 @@ AST* parser::stmt() {
 				//check if the callee return type is the same as the caller type
 			}
 			else {
-				if (! this->isSameType(eTest, fromY)) {
-					cout << "Symantic Error, 2  different types "<<eTest->name << " is not the same type  "<< endl;
-				}
-				//if(eTest->f.var.type == )
-				if (fromY->type == ast_integer) {
-					//update the symbol table entry
-					eTest->token.value = eval_ast_expr(fd, fromY);
+				//if (! this->isSameType(eTest, fromY)) {
+				//	cout << "Symantic Error, 2  different types "<<eTest->name << " is not the same type  "<< endl;
+				//}
+				////if(eTest->f.var.type == )
+				//if (fromY->type == ast_integer) {
+				//	//update the symbol table entry
+				//	eTest->token.value = eval_ast_expr(fd, fromY);
 
+				//}
+				//else if (fromY->type == ast_string) {
+				//	eTest->token.stringValue = fromY->f.a_string.str_value;
+
+				//}
+				//TODO: think of making new AST with the evaluated expression stored inside
+				//this is an assignment node, assign the left argument
+				int result = eval_ast_expr(this->fd, fromY);
+				if (result != ERROR_EVAL_EXPR) {
+					eTest->token.value = result;
 				}
 				else if (fromY->type == ast_string) {
 					eTest->token.stringValue = fromY->f.a_string.str_value;
-
 				}
-				//TODO: think of making new AST with the evaluated expression stored inside
-				return make_ast_node(ast_assign, eTest, fromY);
+				else {
+					//error
+				}
+
+				fromY->f.a_assign.lhs = eTest;
+				return fromY;
+				//return make_ast_node(ast_assign, eTest, fromY);
 			}
 		}
 	}
@@ -646,10 +660,13 @@ AST* parser::Y() {
 		AST* fromExpr = new AST();
 		fromExpr = expr();
 		if (fromExpr) {
-			if (fromExpr->type == ast_call) {
-				return fromExpr;
-			}
-			return make_ast_node(fromExpr->type, eval_ast_expr(fd, fromExpr));
+			//if (fromExpr->type == ast_call) {
+				//return fromExpr;
+			//}
+			//return make_ast_node(fromExpr->type, eval_ast_expr(fd, fromExpr));
+			//return make_ast_node(fromExpr->type, fromE);
+			//assignment node
+			return make_ast_node(ast_assign, new AST(), fromExpr);
 		}
 		else return NULL;
 	}
@@ -896,7 +913,8 @@ AST* parser::F() {
 		if (fromFbar) {
 			if (fromFbar->type != NULL) {
 				fromFbar->f.a_binary_op.larg = temp; //making left of plus_minus = the thing came from G();
-				return fromFbar;
+				return make_ast_node(fromFbar->type, fromFbar->f.a_binary_op.larg, fromFbar->f.a_binary_op.rarg);
+				//return fromFbar;
 			}
 			else {
 				return temp;

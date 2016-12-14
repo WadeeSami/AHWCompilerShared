@@ -2,6 +2,8 @@
 #define __AST__H
 //#include "parser.h"
 #include "symboltable.h"
+#include <climits>
+#define ERROR_EVAL_EXPR  INT_MAX
 //ast.h
 /* Definitions of list datatypes */
 /* List of AST nodes */

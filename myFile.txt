@@ -1,9 +1,7 @@
-function id (x : integer, y:string) :integer
+procedure id (x : integer, y:string) 
 begin
-var id3 : integer;
-var id1 : boolean;
-id3 := 3;
-return (id3);
+var id3 : string;
+if 3 = true then id3 := 5 + 4 fi;
 end;
 var id2 : string;
 constant m = 55;

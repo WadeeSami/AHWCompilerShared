@@ -154,6 +154,7 @@ int eval_ast_expr (FileDescriptor *fd, AST *n)
 {
     if (n == NULL){
         cout << ("NULL AST in eval_ast_expr\n");
+		return ERROR_EVAL_EXPR;
         //throw Exception("NULL AST in eval_ast_expr'n");
     }
     switch (n->type)
@@ -163,15 +164,15 @@ int eval_ast_expr (FileDescriptor *fd, AST *n)
             return (n->f.a_var.var->f.constant.value);
         else
             //report_error (fd, "Cannot use variables in constant expressions");
-            cout << "Cannot use variables in constant expressions\n";
-        return (0);
+            //cout << "Cannot use variables in constant expressions\n";
+        return ERROR_EVAL_EXPR;
         case ast_integer:
             return (n->f.a_integer.value);
         case ast_string:
             //report_error (fd, "Cannot use strings in constant expressions");
             cout << "Cannot use strings in constant expressions\n";
 
-            return (0);
+            return ERROR_EVAL_EXPR;
         case ast_boolean:
             return (n->f.a_boolean.value);
         case ast_times:
@@ -207,9 +208,9 @@ int eval_ast_expr (FileDescriptor *fd, AST *n)
         case ast_uminus:
             return (- eval_ast_expr (fd, n->f.a_unary_op.arg));
         default:
-            cout << "Unknown AST node in eval ast expr \n";
+            //cout << "Unknown AST node in eval ast expr \n";
             //throw Exception("Unknown AST node in eval ast expr \n");
-            return (0);
+            return ERROR_EVAL_EXPR;
         }
 }
 /////////////////////////////////////////////////////////////////////
