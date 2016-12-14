@@ -1,5 +1,6 @@
 #pragma once
 #include "symboltable.h"
+#include "SC.h"
 #include "ast.h"
 #include <vector>
 #include <iostream>
@@ -11,6 +12,7 @@ class parser {
 private:
 	int index;
 	vector <TOKEN*> *tokens;
+	sc * symanicChecker;
 public:
 	ast_list_cell *program;
 	AST * tempDeclNode;

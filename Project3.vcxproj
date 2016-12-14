@@ -115,6 +115,7 @@
     <ClInclude Include="ast.h" />
     <ClInclude Include="fd.h" />
     <ClInclude Include="parser.h" />
+    <ClInclude Include="SC.h" />
     <ClInclude Include="scanner.h" />
     <ClInclude Include="symboltable.h" />
   </ItemGroup>
@@ -123,6 +124,7 @@
     <ClCompile Include="fd.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="parser.cpp" />
+    <ClCompile Include="SC.cpp" />
     <ClCompile Include="scanner.cpp" />
     <ClCompile Include="symbolTable.cpp" />
   </ItemGroup>

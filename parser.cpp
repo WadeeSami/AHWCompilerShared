@@ -3,6 +3,7 @@
 parser::parser() {
 	tokens = new vector <TOKEN*>;
 	index = 0;
+	symanicChecker = new sc();
 }
 
 int parser::findJType(int c)
@@ -26,6 +27,7 @@ void parser::parse(FileDescriptor *fd, symbolTable *st) {
 	//AST* a = new AST();
 	ast_list* a = new ast_list();
 	a = declList();
+	this->symanicChecker->symanticallyCheck(a);
 	//cout<<eval_ast_expr(fd,expr());
 }
 void parser::scanAllTokens() {
@@ -589,9 +591,16 @@ AST* parser::stmt() {
 									if (fromExpr) {
 										t->type = lx_rparen;
 										if (match(t)) {
-											return make_ast_node(ast_return, eval_ast_expr(fd, fromExpr));
+											//return make_ast_node(ast_return, eval_ast_expr(fd, fromExpr));
+											return make_ast_node(ast_return, fromExpr);
+										}
+										else {
+											cout << "syntax error , missing right paren in return statement " << endl;
 										}
 									}
+								}
+								else {
+									cout << "syntax error , missing left paren in return statement " << endl;
 								}
 							}
 							else {
