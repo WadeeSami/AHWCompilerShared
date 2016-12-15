@@ -1,4 +1,13 @@
-﻿  SC.cpp
+﻿  parser.cpp
 c:\users\wadee\desktop\project3\project3\sc.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\wadee\desktop\project3\project3\parser.cpp(11): warning C4101: 'typeIndex': unreferenced local variable
+c:\users\wadee\desktop\project3\project3\parser.cpp(922): warning C4101: 'relOper': unreferenced local variable
+  ast.cpp
+  Generating Code...
+c:\users\wadee\desktop\project3\project3\parser.cpp(920): warning C4715: 'parser::F': not all control paths return a value
+c:\users\wadee\desktop\project3\project3\parser.cpp(929): warning C4715: 'parser::findRelOp': not all control paths return a value
+c:\users\wadee\desktop\project3\project3\parser.cpp(934): warning C4715: 'parser::findJTypeFromToken': not all control paths return a value
+c:\users\wadee\desktop\project3\project3\parser.cpp(980): warning C4715: 'parser::G': not all control paths return a value
+c:\users\wadee\desktop\project3\project3\parser.cpp(1027): warning C4715: 'parser::H': not all control paths return a value
   Project3.vcxproj -> C:\Users\wadee\Desktop\Project3\x64\Debug\Project3.exe
   Project3.vcxproj -> C:\Users\wadee\Desktop\Project3\x64\Debug\Project3.pdb (Partial PDB)

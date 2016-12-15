@@ -4,10 +4,10 @@
 
 class sc {
 private:
-	
+	symbolTable *st;
 
 public:
-	sc();
+	sc(symbolTable * st);
 	bool checkStatement(AST * n, j_type expectedType);
 	j_type expressionType(AST * n);
 	void symanticallyCheck(ast_list * program);
@@ -17,5 +17,6 @@ public:
 	j_type symanticallycheckExpression(AST * expr);
 	bool symanicallyCheckfunctionBody(AST * body);
 	bool symanticallyCheckStmt(AST * stmt);
-
+	bool isExpressionNode(AST * ast);
+	bool compareFormalAndActualParameters(AST * routineCall);
 };

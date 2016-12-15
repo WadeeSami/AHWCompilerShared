@@ -73,7 +73,7 @@ bool symbolTable::insertElement(Element *e) {
 		cout << "Already defined variable/method "<<e->name << endl;
 		return false;
 	}
-	cout << currScope->id << endl;
+	//cout << currScope->id << endl;
 	currScope->elements->push_back(e);
 	return true;
 }

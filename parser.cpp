@@ -3,7 +3,7 @@
 parser::parser() {
 	tokens = new vector <TOKEN*>;
 	index = 0;
-	symanicChecker = new sc();
+	
 }
 
 int parser::findJType(int c)
@@ -19,6 +19,7 @@ int parser::findJType(int c)
 void parser::parse(FileDescriptor *fd, symbolTable *st) {
 	this->fd = fd;
 	this->st = st;
+	symanicChecker = new sc(this->st);
 	program = new ast_list_cell();
 	myS = new SCANNER(this->fd);
 	scanAllTokens();
@@ -171,7 +172,7 @@ AST* parser::decl() {
 								e->entry_type = ste_routine;
 								e->f.routine.result_type = j_type(this->findJTypeFromToken(routineReturnType->type));
 								//TODO: fix this shit
-								e->f.routine.formals = NULL;
+								e->f.routine.formals = this->convertASTListToElemenntList(fromFormalList);
 								if (!st->insertElement(e)) {
 									//already defined
 									return NULL;
@@ -417,18 +418,15 @@ AST* parser::stmt() {
 			cout << "The variable " << tokens->at(index - 1)->str_ptr << " Is not defined, This error is at line "<<this->fd->GetLineNum() << endl;
 			return NULL;
 		}
-
-		//this element must be a variable to be in the left side
-		if (eTest->entry_type != ste_var) {
-			cout << "A variable only can be assiged, niether a function nor a constant" << endl;
-		}
+		
 		AST * fromY = new AST();
 		fromY = Y();
 		if (fromY) {
 			if (fromY->type == ast_call) {//function invocation
 				//get function's return type
 				cout << "helloo" << endl;
-				//check if the callee return type is the same as the caller type
+				fromY->f.a_call.callee = eTest;
+				return fromY;
 			}
 			else {
 				//if (! this->isSameType(eTest, fromY)) {
@@ -660,11 +658,6 @@ AST* parser::Y() {
 		AST* fromExpr = new AST();
 		fromExpr = expr();
 		if (fromExpr) {
-			//if (fromExpr->type == ast_call) {
-				//return fromExpr;
-			//}
-			//return make_ast_node(fromExpr->type, eval_ast_expr(fd, fromExpr));
-			//return make_ast_node(fromExpr->type, fromE);
 			//assignment node
 			return make_ast_node(ast_assign, new AST(), fromExpr);
 		}

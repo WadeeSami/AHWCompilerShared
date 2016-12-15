@@ -1,7 +1,9 @@
 #include "SC.h"
 #define SYMANTIC_ERROR -1000
-sc::sc()
+
+sc::sc(symbolTable * st)
 {
+	this->st = st;
 }
 
 bool sc::checkStatement(AST * n, j_type expectedType)
@@ -266,6 +268,12 @@ j_type sc::symanticallycheckExpression(AST * expr)
 			}
 		}
 	}
+	case ast_call: {
+		if (this->compareFormalAndActualParameters(expr)) {
+			return type_routine;
+		}
+		break;
+	}
 	default:
 		return type_none;
 	}
@@ -340,8 +348,94 @@ bool sc::symanticallyCheckStmt(AST * stmt)
 		}
 		return true;
 	}
+	case ast_call: {
+		//check matching formal and actual parameters
+		/*ast_list * actualParameters = stmt->f.a_call.arg_list;
+		Element * routinRecord = this->st->lookUp(stmt->f.a_routine_decl.name->name);
+		element_list * stFormalsList = routinRecord->f.routine.formals;*/
+		return this->compareFormalAndActualParameters(stmt);
+	}
 	default:
 		break;
+	}
+	return false;
+}
+
+bool sc::isExpressionNode(AST * ast)
+{
+	switch (ast->type) {
+	case ast_times:
+	case ast_divide:
+	case ast_plus:
+	case ast_minus:
+	case ast_eq:
+	case ast_neq:
+	case ast_lt:
+	case ast_le:
+	case ast_gt:
+	case ast_ge:
+	case ast_and:
+	case ast_or:
+	case ast_cand:
+	case ast_cor:
+	{
+		return true;
+	}
+
+	default: {
+		return false;
+	}
+	}
+	return false;
+}
+
+bool sc::compareFormalAndActualParameters(AST * routineCall)
+{
+	Element * routinRecord = this->st->lookUp(routineCall->f.a_call.callee->name);
+	element_list * stFormalParameters = routinRecord->f.routine.formals;
+	ast_list * functionActualParametes = routineCall->f.a_call.arg_list;
+
+	while (stFormalParameters && functionActualParametes) {
+		if (stFormalParameters->head && functionActualParametes->head) {
+			//check if equal types
+			if (stFormalParameters->head->f.var.type == j_type(this->convertAstTypeToJType(functionActualParametes->head->type))) {
+				stFormalParameters = stFormalParameters->tail;
+				functionActualParametes = functionActualParametes->tail;
+			}
+			else if (functionActualParametes->head->type == ast_var) {
+				if (stFormalParameters->head->f.var.type == functionActualParametes->head->f.a_var.var->f.var.type) {
+					stFormalParameters = stFormalParameters->tail;
+					functionActualParametes = functionActualParametes->tail;
+				}
+				else {
+					cout << "Calling the function " << routinRecord->name << " with Invaid arguments/ differnet types " << endl;
+					return false;
+				}
+			}
+			else if (this->isExpressionNode(functionActualParametes->head)) {
+				//case of an expression
+				if (stFormalParameters->head->f.var.type == this->symanticallycheckExpression(functionActualParametes->head)) {
+					stFormalParameters = stFormalParameters->tail;
+					functionActualParametes = functionActualParametes->tail;
+				}
+				else {
+					return false;
+				}
+			}
+			else {
+				cout << "Calling the function " << routinRecord->name << " with Invaid arguments/ differnet types " << endl;
+				return false;
+			}
+		}
+		else if (stFormalParameters->head || functionActualParametes->head) {
+			//one of them does not have the same number of arguments
+			cout << "Calling the function " << routinRecord->name << " with a different number of arguments " << endl;
+			return false;
+		}
+		else {
+			//equally likely
+			return true;
+		}
 	}
 	return false;
 }

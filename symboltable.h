@@ -12,7 +12,8 @@ typedef enum {
 	type_string,
 	type_boolean,
 	type_float,
-	type_none
+	type_none,
+	type_routine
 
 } j_type;
 
