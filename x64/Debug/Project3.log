@@ -1,2 +1,4 @@
-﻿  Project3.vcxproj -> C:\Users\wadee\Desktop\Project3\x64\Debug\Project3.exe
+﻿  SC.cpp
+c:\users\wadee\desktop\project3\project3\sc.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  Project3.vcxproj -> C:\Users\wadee\Desktop\Project3\x64\Debug\Project3.exe
   Project3.vcxproj -> C:\Users\wadee\Desktop\Project3\x64\Debug\Project3.pdb (Partial PDB)

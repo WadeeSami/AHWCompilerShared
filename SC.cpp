@@ -151,7 +151,6 @@ j_type sc::symanticallycheckExpression(AST * expr)
 	{
 	case ast_times:
 	case ast_divide:
-	case ast_plus:
 	case ast_minus:
 	{
 		//leaf and right has to be integer
@@ -176,7 +175,38 @@ j_type sc::symanticallycheckExpression(AST * expr)
 			}
 		}
 	}
+	/////////
+	case ast_plus: {
+		//leaf and right has to be integer
+		AST * left = expr->f.a_binary_op.larg;
+		AST * right = expr->f.a_binary_op.rarg;
 
+		if (left->type == ast_boolean || right->type == ast_boolean) {
+			cout << " This Language can't add booleans " << endl;
+			return type_none;
+		}
+		else if (left->type == ast_integer && right->type == ast_integer) {
+			return type_integer;
+		}
+		else if (left->type == ast_string && right->type == ast_string) {
+			return type_string;
+		}
+		else {
+			j_type leftRes = this->symanticallycheckExpression(left);
+			j_type rightRes = this->symanticallycheckExpression(right);
+			if (leftRes == rightRes) {
+				return leftRes;
+			}
+			else {
+				return type_none;
+			}
+		}
+		break;
+	}
+
+
+	///////////
+	
 	case ast_lt:
 	case ast_le:
 	case ast_gt:
