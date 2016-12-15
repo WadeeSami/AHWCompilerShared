@@ -22,7 +22,6 @@ void sc::symanticallyCheck(ast_list * program)
 	ast_list * currentDeclaration = NULL;
 	currentDeclaration = program;
 	while (currentDeclaration) {
-		//cout << "Hello from the other side" << endl;
 		if (currentDeclaration->head) {
 			if (currentDeclaration->head->type == ast_routine_decl) {
 				this->isroutineSymanticallyCorrect(currentDeclaration->head);
@@ -304,7 +303,16 @@ bool sc::symanticallyCheckStmt(AST * stmt)
 	{
 	case ast_assign: {
 		//check expression
-		return this->symanticallycheckExpression(stmt->f.a_assign.rhs) != type_none;
+		j_type expressionType = this->symanticallycheckExpression(stmt->f.a_assign.rhs);
+		if (stmt->f.a_assign.lhs->entry_type == ste_var) {
+			if (expressionType != stmt->f.a_assign.lhs->f.var.type) {
+				cout << "symantic error, left handside and right handside must have the same type " << endl;
+				return false;
+			}
+			return true;
+		}
+		cout << "Symantic error, left handside must be a variable " << endl;
+		return false;
 	}
 	case ast_if: {
 		//check predicate

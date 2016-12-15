@@ -4,9 +4,10 @@ return (5) ;
 end;
 procedure id (x : integer, y:string) 
 begin
-var id3 : boolean;
-var x : integer;
-vproc();
+var id3 : integer;
+var x : string;
+x := "ss";
+vproc(5);
 if 3 = 4 then id3 := 5 + 4 else id3 := 5+ 6 fi;
 while 3 > 5 do id3 := 55  + 45 od;
 for id3 := 5  to 5  do x := 4 od;
